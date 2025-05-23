@@ -18,6 +18,8 @@ func _ready():
 	if has_node("CenterContainer/Label"):
 		$CenterContainer/Label.text = letter
 
+
+
 func _get_drag_data(_at_position: Vector2) -> Variant:
 	Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
 
@@ -50,6 +52,8 @@ func _can_drop_data(_at_position, _data):
 
 
 func _gui_input(event):
+	if not is_multiplayer_authority():
+		return	# only the controlling peer can cook
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		#set_drag_preview(duplicate())
 		mouse_default_cursor_shape = Control.CURSOR_DRAG

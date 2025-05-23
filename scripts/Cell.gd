@@ -5,7 +5,7 @@ extends Control
 func _can_drop_data(_pos, data):
 	return data.has("letter")
 
-func _drop_data(pos, data):
+func _drop_data(_pos, data):
 	var cell_pos = Vector2i(position / board.cell_size)
 	var tile = data["source"]
 	tile.get_parent().remove_child(tile)

@@ -4,7 +4,7 @@ extends Node2D
 var board_state := {}  # Dictionary with Vector2i -> letter
 
 var zoom_level := 1.0
-var grid_size := 15  # visible range
+var grid_size := 1  # visible range
 var cell_size := 64  # pixel size
 
 var is_dragging := false
@@ -16,6 +16,7 @@ var drag_start_offset := Vector2.ZERO
 @onready var tile_rack: Control = get_parent().get_node("TileRack")
 
 func _ready():
+	print("player board owned by: %s | Am I authority? %s" % [get_multiplayer_authority(), is_multiplayer_authority()])
 	draw_visible_grid(Vector2i(0, 0), grid_size)
 	
 	# THIS IS VERY TEMPORARY OKAY
@@ -23,12 +24,12 @@ func _ready():
 	tile_rack.add_tile("D")
 	tile_rack.add_tile("B")
 
-func draw_visible_grid(center: Vector2i, range: int):
+func draw_visible_grid(center: Vector2i, tile_range):
 	queue_free_children(grid_root)
 
-	for x in range * 2:
-		for y in range * 2:
-			var pos = center + Vector2i(x - range, y - range)
+	for x in tile_range * 2:
+		for y in tile_range * 2:
+			var pos = center + Vector2i(x - tile_range, y - tile_range)
 
 			var cell = cell_scene.instantiate()
 			cell.board = self

@@ -1,3 +1,4 @@
+# Main
 extends Control
 
 var peer = ENetMultiplayerPeer.new()
@@ -32,17 +33,18 @@ func _on_connected_to_server():
 # things that both host and client must do. 
 func on_join_setup():
 	start_menu.visible = false
-	multiplayer.peer_connected.connect(_add_player)
-	multiplayer.peer_disconnected.connect(_on_player_disconnected)
-
-	multiplayer.multiplayer_peer = peer
+	if not multiplayer.peer_connected.is_connected(_add_player):
+		multiplayer.peer_connected.connect(_add_player)
+	if not multiplayer.peer_disconnected.is_connected(_on_player_disconnected):
+		multiplayer.peer_disconnected.connect(_on_player_disconnected)
 	
-	var player_name = name_field.text.strip_edges()
-	send_name_to_host(player_name)
-	
-	var my_id = multiplayer.get_unique_id()
+	var my_id = peer.get_unique_id()
 	_add_player(my_id)  # So your own board appears!
 
+	multiplayer.multiplayer_peer = peer
+
+	var player_name = name_field.text.strip_edges()
+	send_name_to_host(player_name)
 
 	
 func update_player_ui():
@@ -71,22 +73,40 @@ func _sort_by_player_name(a, b) -> bool:
 	return player_names.get(a, "").to_lower() < player_names.get(b, "").to_lower()
 
 func _add_player(id = 1):
+	print("----------------- ADDING PLAYER ------------------")
+	if has_node(str(id)):
+		print("Player %d already added; skipping" % id)
+		return
+	print("++ Adding Player %d (mine? %s)" % [id, id == multiplayer.get_unique_id()])
+
+
 	var player = player_scene.instantiate()
 	player.name = str(id)
-	call_deferred("add_child", player)
+	if id == multiplayer.get_unique_id():
+		player.set_multiplayer_authority(id)  # ✅ before add_child
+	call_deferred("_finalize_add_player", player, id)
 	
 	# If I'm the host and this is not me, send all existing names to the new guy
+	#bug fix#
+	# this is so that the player only creates the board for himself.
+	#if multiplayer.is_server() and id != multiplayer.get_unique_id():
+		#for other_id in player_names.keys():
+			#if other_id != id:
+				#broadcast_name_to_all.rpc_id(id, other_id, player_names[other_id])  # tell the new player
+	#update_player_ui()
+	
+func _finalize_add_player(player, id):
+	add_child(player)
+	await get_tree().process_frame
+
+	# Send name sync info from host to new peer
 	if multiplayer.is_server() and id != multiplayer.get_unique_id():
 		for other_id in player_names.keys():
-			broadcast_name_to_all.rpc_id(id, other_id, player_names[other_id])  # tell the new player
-	
+			if other_id != id:
+				broadcast_name_to_all.rpc_id(id, other_id, player_names[other_id])
+
 	update_player_ui()
-	
-	# this is so that the player only creates the board for himself.
-	print("this happens right")
-	if id == multiplayer.get_unique_id():
-		print("hello? hellooo?")
-		player.create_board()
+
 	
 @rpc("any_peer")
 func send_name_to_host(player_name: String):
