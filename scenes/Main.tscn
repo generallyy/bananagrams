@@ -1,7 +1,14 @@
-[gd_scene load_steps=5 format=3 uid="uid://brvtubuhsvnjt"]
+[gd_scene load_steps=8 format=3 uid="uid://brvtubuhsvnjt"]
 
 [ext_resource type="Script" path="res://scripts/Main.gd" id="1_c455u"]
 [ext_resource type="PackedScene" uid="uid://d0d32oahjs3ed" path="res://scenes/player.tscn" id="2_bosci"]
+
+[sub_resource type="SystemFont" id="SystemFont_m3p4o"]
+font_names = PackedStringArray("Andale Mono")
+
+[sub_resource type="Theme" id="Theme_d8q4l"]
+default_font = SubResource("SystemFont_m3p4o")
+default_font_size = 30
 
 [sub_resource type="SystemFont" id="SystemFont_q8yek"]
 font_names = PackedStringArray("Andale Mono")
@@ -10,36 +17,86 @@ font_names = PackedStringArray("Andale Mono")
 default_font = SubResource("SystemFont_q8yek")
 default_font_size = 100
 
-[node name="Main" type="Node2D"]
-position = Vector2(0, -2)
+[sub_resource type="Theme" id="Theme_ggpal"]
+default_font_size = 20
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_d8q4l")
 script = ExtResource("1_c455u")
 player_scene = ExtResource("2_bosci")
 
-[node name="CenterContainer" type="CenterContainer" parent="."]
-visible = false
+[node name="Start Menu" type="CenterContainer" parent="."]
 texture_filter = 1
 offset_right = 1152.0
 offset_bottom = 650.0
 theme = SubResource("Theme_7l18r")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
-offset_left = 47.0
-offset_top = 32.0
-offset_right = 593.0
-offset_bottom = 88.0
+[node name="VBoxContainer" type="VBoxContainer" parent="Start Menu"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Start Menu/VBoxContainer"]
+layout_mode = 2
 theme_override_constants/separation = 50
 
-[node name="host" type="Button" parent="HBoxContainer"]
+[node name="host" type="Button" parent="Start Menu/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 text = "host"
 
-[node name="join" type="Button" parent="HBoxContainer"]
+[node name="join" type="Button" parent="Start Menu/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 text = "join"
+
+[node name="NameField" type="LineEdit" parent="Start Menu/VBoxContainer"]
+layout_mode = 2
+placeholder_text = "name"
+alignment = 1
+max_length = 10
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 40.0
+offset_bottom = 40.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "empty (label)"
+horizontal_alignment = 1
+
+[node name="RightPanel" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -301.925
+offset_top = 62.8
+offset_right = -103.923
+offset_bottom = 102.8
+grow_horizontal = 0
+
+[node name="Label" type="Label" parent="RightPanel"]
+layout_mode = 2
+text = "other uncs:"
+
+[node name="MarginContainer" type="MarginContainer" parent="RightPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 40
+
+[node name="PanelNames" type="VBoxContainer" parent="RightPanel/MarginContainer"]
+layout_mode = 2
+theme = SubResource("Theme_ggpal")
+theme_override_constants/separation = 20
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
 _spawnable_scenes = PackedStringArray("res://scenes/player.tscn")
 spawn_path = NodePath("..")
 
-[connection signal="pressed" from="HBoxContainer/host" to="." method="_on_host_pressed"]
-[connection signal="pressed" from="HBoxContainer/join" to="." method="_on_join_pressed"]
+[connection signal="pressed" from="Start Menu/VBoxContainer/HBoxContainer/host" to="." method="_on_host_pressed"]
+[connection signal="pressed" from="Start Menu/VBoxContainer/HBoxContainer/join" to="." method="_on_join_pressed"]
