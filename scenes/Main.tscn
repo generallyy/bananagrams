@@ -5,6 +5,7 @@
 
 [sub_resource type="SystemFont" id="SystemFont_m3p4o"]
 font_names = PackedStringArray("Andale Mono")
+subpixel_positioning = 0
 
 [sub_resource type="Theme" id="Theme_d8q4l"]
 default_font = SubResource("SystemFont_m3p4o")
@@ -33,6 +34,7 @@ player_scene = ExtResource("2_bosci")
 
 [node name="Start Menu" type="CenterContainer" parent="."]
 texture_filter = 1
+layout_mode = 0
 offset_right = 1152.0
 offset_bottom = 650.0
 theme = SubResource("Theme_7l18r")

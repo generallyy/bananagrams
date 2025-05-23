@@ -7,6 +7,7 @@ var peer = ENetMultiplayerPeer.new()
 @onready var right_panel = $RightPanel/MarginContainer/PanelNames
 @onready var name_field = get_node("Start Menu/VBoxContainer/NameField")
 var player_names = {}
+var next_default_name = 1
 
 func _on_host_pressed():
 	peer.create_server(135)
@@ -20,7 +21,6 @@ func _on_join_pressed():
 	multiplayer.multiplayer_peer = peer
 
 func _on_connected_to_server():
-	print("hi this happens btw")
 	multiplayer.connected_to_server.disconnect(_on_connected_to_server)
 	on_join_setup()
 
@@ -33,11 +33,6 @@ func on_join_setup():
 	multiplayer.multiplayer_peer = peer
 	
 	var player_name = name_field.text.strip_edges()
-	if player_name.is_empty():
-		player_name = "Player %d" % (multiplayer.get_peers().size() + 1)
-	
-	# store and send names
-	player_names[multiplayer.get_unique_id()] = player_name
 	send_name_to_host(player_name)
 
 	
@@ -49,11 +44,11 @@ func update_player_ui():
 	for child in right_panel.get_children():
 		child.queue_free()
 
-	var all_ids = multiplayer.get_peers().duplicate() #+ [1]  # add host manually if not self
+	var all_ids = Array(multiplayer.get_peers()) #+ [1]  # add host manually if not self
 	if not all_ids.has(my_id):	# add host.
 		all_ids.append(my_id)
-	
-	all_ids.sort()
+
+	all_ids.sort_custom(Callable(self, "_sort_by_player_name"))
 
 	for id in all_ids:
 		if id == my_id:
@@ -62,6 +57,9 @@ func update_player_ui():
 		var label = Label.new()
 		label.text = player_names.get(id, "Player %d" % id)
 		right_panel.add_child(label)
+
+func _sort_by_player_name(a, b) -> bool:
+	return player_names.get(a, "").to_lower() < player_names.get(b, "").to_lower()
 
 func _add_player(id = 1):
 	var player = player_scene.instantiate()
@@ -81,8 +79,14 @@ func send_name_to_host(player_name: String):
 		var sender_id = multiplayer.get_remote_sender_id()
 		if sender_id == 0:
 			sender_id = multiplayer.get_unique_id()
-		# now broadcast.
+		
+		if player_name.is_empty():
+			player_name = "Player %d" % (player_names.size() + 1)
+			next_default_name += 1
+		# store and send names
 		player_names[sender_id] = player_name
+		
+		# now broadcast.
 		broadcast_name_to_all.rpc(sender_id, player_name)
 		
 		# this is so that player 1 can see himself
