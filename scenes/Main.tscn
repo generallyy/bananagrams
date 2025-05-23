@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=3 uid="uid://brvtubuhsvnjt"]
 
 [ext_resource type="Script" path="res://scripts/Main.gd" id="1_c455u"]
-[ext_resource type="PackedScene" uid="uid://d0d32oahjs3ed" path="res://scenes/player.tscn" id="2_bosci"]
+[ext_resource type="PackedScene" uid="uid://d0d32oahjs3ed" path="res://scenes/Player.tscn" id="2_bosci"]
 
 [sub_resource type="SystemFont" id="SystemFont_m3p4o"]
 font_names = PackedStringArray("Andale Mono")
@@ -32,6 +32,8 @@ theme = SubResource("Theme_d8q4l")
 script = ExtResource("1_c455u")
 player_scene = ExtResource("2_bosci")
 
+[node name="Player" parent="." instance=ExtResource("2_bosci")]
+
 [node name="Start Menu" type="CenterContainer" parent="."]
 texture_filter = 1
 layout_mode = 0
@@ -60,18 +62,6 @@ placeholder_text = "name"
 alignment = 1
 max_length = 10
 
-[node name="Label" type="Label" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = 40.0
-offset_bottom = 40.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "empty (label)"
-horizontal_alignment = 1
-
 [node name="RightPanel" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 1
@@ -95,6 +85,18 @@ theme_override_constants/margin_left = 40
 layout_mode = 2
 theme = SubResource("Theme_ggpal")
 theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 40.0
+offset_bottom = 40.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "empty (label)"
+horizontal_alignment = 1
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
 _spawnable_scenes = PackedStringArray("res://scenes/player.tscn")

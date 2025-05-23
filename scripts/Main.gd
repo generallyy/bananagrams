@@ -6,8 +6,13 @@ var peer = ENetMultiplayerPeer.new()
 @onready var top_label = $Label
 @onready var right_panel = $RightPanel/MarginContainer/PanelNames
 @onready var name_field = get_node("Start Menu/VBoxContainer/NameField")
+@onready var player = $Player
 var player_names = {}
 var next_default_name = 1
+
+
+#func _ready():
+	#start_menu.visible = true
 
 func _on_host_pressed():
 	peer.create_server(135)
@@ -34,6 +39,10 @@ func on_join_setup():
 	
 	var player_name = name_field.text.strip_edges()
 	send_name_to_host(player_name)
+	
+	var my_id = multiplayer.get_unique_id()
+	_add_player(my_id)  # So your own board appears!
+
 
 	
 func update_player_ui():
@@ -72,6 +81,12 @@ func _add_player(id = 1):
 			broadcast_name_to_all.rpc_id(id, other_id, player_names[other_id])  # tell the new player
 	
 	update_player_ui()
+	
+	# this is so that the player only creates the board for himself.
+	print("this happens right")
+	if id == multiplayer.get_unique_id():
+		print("hello? hellooo?")
+		player.create_board()
 	
 @rpc("any_peer")
 func send_name_to_host(player_name: String):
