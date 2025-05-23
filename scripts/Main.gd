@@ -4,15 +4,16 @@ var peer = ENetMultiplayerPeer.new()
 @export var player_scene: PackedScene
 @onready var start_menu = get_node("Start Menu")
 @onready var top_label = $Label
-@onready var right_panel = $RightPanel/MarginContainer/PanelNames
+@onready var right_panel = $PeersPanel/MarginContainer/PanelNames
 @onready var name_field = get_node("Start Menu/VBoxContainer/NameField")
 @onready var player = $Player
 var player_names = {}
 var next_default_name = 1
 
 
-#func _ready():
+func _ready():
 	#start_menu.visible = true
+	$Player/TileRack.visible = false
 
 func _on_host_pressed():
 	peer.create_server(135)
@@ -32,6 +33,7 @@ func _on_connected_to_server():
 # things that both host and client must do. 
 func on_join_setup():
 	start_menu.visible = false
+	$Player/TileRack.visible = true
 	multiplayer.peer_connected.connect(_add_player)
 	multiplayer.peer_disconnected.connect(_on_player_disconnected)
 

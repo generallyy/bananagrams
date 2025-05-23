@@ -33,6 +33,7 @@ script = ExtResource("1_c455u")
 player_scene = ExtResource("2_bosci")
 
 [node name="Player" parent="." instance=ExtResource("2_bosci")]
+layout_mode = 1
 
 [node name="Start Menu" type="CenterContainer" parent="."]
 texture_filter = 1
@@ -62,26 +63,22 @@ placeholder_text = "name"
 alignment = 1
 max_length = 10
 
-[node name="RightPanel" type="VBoxContainer" parent="."]
+[node name="PeersPanel" type="VBoxContainer" parent="."]
 layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -301.925
-offset_top = 62.8
-offset_right = -103.923
-offset_bottom = 102.8
-grow_horizontal = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 218.695
+offset_bottom = 59.0
 
-[node name="Label" type="Label" parent="RightPanel"]
+[node name="Label" type="Label" parent="PeersPanel"]
 layout_mode = 2
 text = "other uncs:"
 
-[node name="MarginContainer" type="MarginContainer" parent="RightPanel"]
+[node name="MarginContainer" type="MarginContainer" parent="PeersPanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 40
 
-[node name="PanelNames" type="VBoxContainer" parent="RightPanel/MarginContainer"]
+[node name="PanelNames" type="VBoxContainer" parent="PeersPanel/MarginContainer"]
 layout_mode = 2
 theme = SubResource("Theme_ggpal")
 theme_override_constants/separation = 20

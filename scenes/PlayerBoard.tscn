@@ -1,8 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://erjjtd0lijub"]
+[gd_scene load_steps=3 format=3 uid="uid://erjjtd0lijub"]
 
 [ext_resource type="Script" path="res://scripts/PlayerBoard.gd" id="1_pjiff"]
 [ext_resource type="PackedScene" uid="uid://ctdxwxyed58yt" path="res://scenes/Cell.tscn" id="2_jjymn"]
-[ext_resource type="PackedScene" uid="uid://b7wwg2dlct326" path="res://scenes/Tile.tscn" id="2_qp6bm"]
 
 [node name="PlayerBoard" type="Node2D"]
 z_index = -1
@@ -12,7 +11,5 @@ cell_scene = ExtResource("2_jjymn")
 [node name="ZoomContainer" type="Node2D" parent="."]
 
 [node name="BoardLayer" type="Node2D" parent="ZoomContainer"]
-
-[node name="Tile" parent="ZoomContainer/BoardLayer" instance=ExtResource("2_qp6bm")]
 
 [node name="GridCells" type="Node2D" parent="ZoomContainer/BoardLayer"]
