@@ -13,9 +13,16 @@ var drag_start_offset := Vector2.ZERO
 
 @onready var grid_root := $ZoomContainer/BoardLayer/GridCells
 @onready var zoom_node := $ZoomContainer
+@onready var tile_rack = get_parent().get_node("TileRack")
 
 func _ready():
 	draw_visible_grid(Vector2i(0, 0), grid_size)
+	
+	# THIS IS VERY TEMPORARY OKAY
+	var tile = preload("res://scenes/Tile.tscn").instantiate()
+	tile_rack.add_tile("A")
+	tile_rack.add_tile("D")
+	tile_rack.add_tile("B")
 
 func draw_visible_grid(center: Vector2i, range: int):
 	queue_free_children(grid_root)
@@ -50,37 +57,32 @@ func _input(event):
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
 			zoom_level *= 1.1
 			zoom_node.scale = Vector2(zoom_level, zoom_level)
+			return
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			zoom_level *= 0.9
 			zoom_node.scale = Vector2(zoom_level, zoom_level)
+			return
 
-	# --- START DRAGGING (Pan) ---
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if event.pressed:
-			# Only pan if not clicking a tile
-			if not is_clicking_tile(event.position):
+		# --- START/STOP DRAGGING ---
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed:
+				if is_clicking_tile():
+					return
 				is_dragging = true
 				drag_start_mouse = event.position
 				drag_start_offset = zoom_node.position
-		else:
-			is_dragging = false
+			else:
+				is_dragging = false
 
 	# --- CONTINUE DRAGGING ---
-	if event is InputEventMouseMotion and is_dragging:
+	elif event is InputEventMouseMotion and is_dragging:
 		var delta = event.position - drag_start_mouse
 		zoom_node.position = drag_start_offset + delta
 
-func is_clicking_tile(pos: Vector2) -> bool:
-	var params = PhysicsPointQueryParameters2D.new()
-	params.position = pos
-	params.collide_with_areas = true
-	params.collide_with_bodies = true
 
-	var space_state = get_world_2d().direct_space_state
-	var result = space_state.intersect_point(params)
-
-	for item in result:
-		if item.collider.is_in_group("draggable_tile"):
+func is_clicking_tile() -> bool:
+	for tile in get_tree().get_nodes_in_group("draggable_tile"):
+		if tile.is_hovered:
 			return true
 	return false
 
