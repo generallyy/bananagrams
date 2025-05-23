@@ -1,6 +1,6 @@
 extends Control
 
-@onready var tile_container = $HBoxContainer
+@onready var tile_container: HBoxContainer = $PanelContainer/HBoxContainer
 
 func add_tile(letter: String):
 	var tile = preload("res://scenes/Tile.tscn").instantiate()

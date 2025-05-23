@@ -32,9 +32,6 @@ theme = SubResource("Theme_d8q4l")
 script = ExtResource("1_c455u")
 player_scene = ExtResource("2_bosci")
 
-[node name="Player" parent="." instance=ExtResource("2_bosci")]
-layout_mode = 1
-
 [node name="Start Menu" type="CenterContainer" parent="."]
 texture_filter = 1
 layout_mode = 0

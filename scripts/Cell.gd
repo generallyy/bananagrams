@@ -1,12 +1,15 @@
-extends Node2D
+extends Control
 
-@export var grid_pos: Vector2i
+@export var board: Node  # set this to PlayerBoard
 
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	pass # Replace with function body.
+func _can_drop_data(_pos, data):
+	return data.has("letter")
 
+func _drop_data(pos, data):
+	var cell_pos = Vector2i(position / board.cell_size)
+	var tile = data["source"]
+	tile.get_parent().remove_child(tile)
+	add_child(tile)
+	tile.position = Vector2.ZERO  # center inside cell
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
+	board.board_state[cell_pos] = tile.letter

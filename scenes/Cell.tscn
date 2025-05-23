@@ -2,7 +2,9 @@
 
 [ext_resource type="Script" path="res://scripts/Cell.gd" id="1_br3w8"]
 
-[node name="Cell" type="Node2D"]
+[node name="Cell" type="Control"]
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("1_br3w8")
 
 [node name="ColorRect" type="ColorRect" parent="."]
