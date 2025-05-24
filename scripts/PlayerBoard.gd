@@ -1,9 +1,10 @@
 extends Node2D
 
+
+
 @export var cell_scene: PackedScene
 var board_state := {}  # Dictionary with Vector2i -> letter
 
-var zoom_level := 1.0
 var grid_size := 15  # visible range
 var cell_size := 64  # pixel size
 
@@ -11,15 +12,22 @@ var is_dragging := false
 var drag_start_mouse := Vector2.ZERO
 var drag_start_offset := Vector2.ZERO
 
-@onready var grid_root := $SubViewportContainer/SubViewport/ZoomContainer/BoardLayer/GridCells
-@onready var zoom_node := $SubViewportContainer/SubViewport/ZoomContainer
+@onready var grid_root = $SubViewportContainer/SubViewport/ZoomContainer/GridCells
+@onready var zoom_node = $SubViewportContainer/SubViewport/ZoomContainer
 @onready var viewport = $SubViewportContainer/SubViewport
+@onready var sanity_dot = zoom_node.get_node("sanity")
 @onready var tile_rack: Control = get_parent().get_node("TileRack")
 
+func _process(_delta):
+	var mouse_pos = viewport.get_mouse_position()
+	var world_pos = zoom_node.get_global_transform().affine_inverse() * mouse_pos
+	sanity_dot.global_position = zoom_node.to_global(world_pos)
 func _ready():
 	print("player board owned by: %s | Am I authority? %s" % [get_multiplayer_authority(), is_multiplayer_authority()])
 	draw_visible_grid(Vector2i(0, 0), grid_size)
 	viewport.size = $SubViewportContainer.size
+	print("grid_root's parent is zoom_node? ", grid_root.get_parent() == zoom_node)
+
 	
 	# THIS IS VERY TEMPORARY OKAY
 	tile_rack.add_tile("A")
@@ -57,22 +65,16 @@ func make_tile(letter: String) -> Node:
 func _input(event):
 	# --- ZOOMING ---
 	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			zoom_level *= 1.1
-			zoom_node.scale = Vector2(zoom_level, zoom_level)
-			return
-		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			zoom_level *= 0.9
-			zoom_node.scale = Vector2(zoom_level, zoom_level)
-			return
+		if (event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN):
+
+			var zoom_change = 1.1 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 1.0 / 1.1
+			zoom(zoom_change)
+			#return
 
 		# --- START/STOP DRAGGING ---
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
-				print("click")
-				print($PanelContainer/DropOverlay.mouse_filter)
 				if is_clicking_tile():
-					print("clicking tile")
 					return
 				is_dragging = true
 				drag_start_mouse = event.position
@@ -95,3 +97,44 @@ func is_clicking_tile() -> bool:
 			return true
 	return false
 
+func zoom(factor: float):
+	var mouse_pos = viewport.get_mouse_position()
+
+	# Compute clamped new scale
+	var current_scale = zoom_node.scale.x
+	var new_scale_value = clamp(current_scale * factor, 0.2, 4.0)
+	if is_equal_approx(new_scale_value, current_scale):
+		return
+
+	var new_scale = Vector2(new_scale_value, new_scale_value)
+
+	# Save original position
+	var original_position = zoom_node.position
+
+	# TEMPORARILY recenter zoom_node to screen center
+	var screen_center = viewport.size / 2
+	zoom_node.position = screen_center
+
+	# Compute world pos under cursor before zoom
+	var before = zoom_node.get_global_transform().affine_inverse() * mouse_pos
+
+	# Apply zoom
+	zoom_node.scale = new_scale
+
+	# Compute world pos under cursor after zoom
+	var after = zoom_node.get_global_transform().affine_inverse() * mouse_pos
+
+	# Restore original position
+	zoom_node.position = original_position
+
+	# Adjust by delta
+	var delta = after - before
+	zoom_node.position += delta
+
+
+
+
+
+	print("Before: ", before)
+	print("After: ", after)
+	print("Delta (unscaled): ", after - before)

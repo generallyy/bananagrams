@@ -28,9 +28,14 @@ render_target_update_mode = 4
 
 [node name="ZoomContainer" type="Node2D" parent="SubViewportContainer/SubViewport"]
 
-[node name="BoardLayer" type="Node2D" parent="SubViewportContainer/SubViewport/ZoomContainer"]
+[node name="GridCells" type="Node2D" parent="SubViewportContainer/SubViewport/ZoomContainer"]
 
-[node name="GridCells" type="Node2D" parent="SubViewportContainer/SubViewport/ZoomContainer/BoardLayer"]
+[node name="sanity" type="Sprite2D" parent="SubViewportContainer/SubViewport/ZoomContainer"]
+
+[node name="ColorRect" type="ColorRect" parent="SubViewportContainer/SubViewport/ZoomContainer/sanity"]
+offset_right = 40.0
+offset_bottom = 40.0
+color = Color(0.854576, 0, 0.22683, 1)
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 anchors_preset = 8
