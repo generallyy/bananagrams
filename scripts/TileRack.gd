@@ -1,9 +1,11 @@
+#tilerack
 extends Control
 
 @onready var tile_container: HBoxContainer = $PanelContainer/HBoxContainer
 
 func _ready():
 	print("TileRack owned by: %s | Am I authority? %s" % [get_multiplayer_authority(), is_multiplayer_authority()])
+
 
 func add_tile(letter: String):
 	var tile = preload("res://scenes/Tile.tscn").instantiate()

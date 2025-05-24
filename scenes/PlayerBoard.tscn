@@ -1,15 +1,50 @@
-[gd_scene load_steps=3 format=3 uid="uid://erjjtd0lijub"]
+[gd_scene load_steps=5 format=3 uid="uid://erjjtd0lijub"]
 
 [ext_resource type="Script" path="res://scripts/PlayerBoard.gd" id="1_pjiff"]
 [ext_resource type="PackedScene" uid="uid://ctdxwxyed58yt" path="res://scenes/Cell.tscn" id="2_jjymn"]
+[ext_resource type="Script" path="res://scripts/DropOverlay.gd" id="3_dpof5"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1u6sc"]
+bg_color = Color(0.6, 0.596078, 0.592157, 0)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
 
 [node name="PlayerBoard" type="Node2D"]
 z_index = -1
 script = ExtResource("1_pjiff")
 cell_scene = ExtResource("2_jjymn")
 
-[node name="ZoomContainer" type="Node2D" parent="."]
+[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+offset_left = 162.0
+offset_right = 991.0
+offset_bottom = 453.0
 
-[node name="BoardLayer" type="Node2D" parent="ZoomContainer"]
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
+handle_input_locally = false
+size = Vector2i(400, 400)
+render_target_update_mode = 4
 
-[node name="GridCells" type="Node2D" parent="ZoomContainer/BoardLayer"]
+[node name="ZoomContainer" type="Node2D" parent="SubViewportContainer/SubViewport"]
+
+[node name="BoardLayer" type="Node2D" parent="SubViewportContainer/SubViewport/ZoomContainer"]
+
+[node name="GridCells" type="Node2D" parent="SubViewportContainer/SubViewport/ZoomContainer/BoardLayer"]
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 159.0
+offset_right = 993.0
+offset_bottom = 455.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1u6sc")
+
+[node name="DropOverlay" type="Control" parent="PanelContainer"]
+layout_mode = 2
+script = ExtResource("3_dpof5")

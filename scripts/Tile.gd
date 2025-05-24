@@ -17,10 +17,13 @@ func _ready():
 		## Optional: update label if you have one
 	if has_node("CenterContainer/Label"):
 		$CenterContainer/Label.text = letter
+		
 
 
 
 func _get_drag_data(_at_position: Vector2) -> Variant:
+	print("🟡 drag started on tile:", letter)
+
 	Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
 
 	
@@ -46,9 +49,9 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 		"source": self
 	}
 
-func _can_drop_data(_at_position, _data):
-	# this removes the "no no" icon... or is supposed to.
-	return false  # not a drop target
+#func _can_drop_data(_at_position, _data):
+	## this removes the "no no" icon... or is supposed to.
+	#return false  # not a drop target
 
 
 func _gui_input(event):

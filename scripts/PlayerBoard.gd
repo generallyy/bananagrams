@@ -4,20 +4,22 @@ extends Node2D
 var board_state := {}  # Dictionary with Vector2i -> letter
 
 var zoom_level := 1.0
-var grid_size := 1  # visible range
+var grid_size := 15  # visible range
 var cell_size := 64  # pixel size
 
 var is_dragging := false
 var drag_start_mouse := Vector2.ZERO
 var drag_start_offset := Vector2.ZERO
 
-@onready var grid_root := $ZoomContainer/BoardLayer/GridCells
-@onready var zoom_node := $ZoomContainer
+@onready var grid_root := $SubViewportContainer/SubViewport/ZoomContainer/BoardLayer/GridCells
+@onready var zoom_node := $SubViewportContainer/SubViewport/ZoomContainer
+@onready var viewport = $SubViewportContainer/SubViewport
 @onready var tile_rack: Control = get_parent().get_node("TileRack")
 
 func _ready():
 	print("player board owned by: %s | Am I authority? %s" % [get_multiplayer_authority(), is_multiplayer_authority()])
 	draw_visible_grid(Vector2i(0, 0), grid_size)
+	viewport.size = $SubViewportContainer.size
 	
 	# THIS IS VERY TEMPORARY OKAY
 	tile_rack.add_tile("A")
@@ -67,7 +69,10 @@ func _input(event):
 		# --- START/STOP DRAGGING ---
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
+				print("click")
+				print($PanelContainer/DropOverlay.mouse_filter)
 				if is_clicking_tile():
+					print("clicking tile")
 					return
 				is_dragging = true
 				drag_start_mouse = event.position
