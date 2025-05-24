@@ -66,9 +66,9 @@ func _input(event):
 	# --- ZOOMING ---
 	if event is InputEventMouseButton:
 		if (event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN):
-
+			var mouse_pos = viewport.get_mouse_position()
 			var zoom_change = 1.1 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 1.0 / 1.1
-			zoom(zoom_change)
+			zoom(zoom_change, mouse_pos)
 			#return
 
 		# --- START/STOP DRAGGING ---
@@ -92,49 +92,15 @@ func _input(event):
 
 
 func is_clicking_tile() -> bool:
+	# legoat https://forum.godotengine.org/t/camera2d-zoom-position-towards-the-mouse/28757/5
 	for tile in get_tree().get_nodes_in_group("draggable_tile"):
 		if tile.is_hovered:
 			return true
 	return false
 
-func zoom(factor: float):
-	var mouse_pos = viewport.get_mouse_position()
-
-	# Compute clamped new scale
-	var current_scale = zoom_node.scale.x
-	var new_scale_value = clamp(current_scale * factor, 0.2, 4.0)
-	if is_equal_approx(new_scale_value, current_scale):
-		return
-
-	var new_scale = Vector2(new_scale_value, new_scale_value)
-
-	# Save original position
-	var original_position = zoom_node.position
-
-	# TEMPORARILY recenter zoom_node to screen center
-	var screen_center = viewport.size / 2
-	zoom_node.position = screen_center
-
-	# Compute world pos under cursor before zoom
-	var before = zoom_node.get_global_transform().affine_inverse() * mouse_pos
-
-	# Apply zoom
-	zoom_node.scale = new_scale
-
-	# Compute world pos under cursor after zoom
-	var after = zoom_node.get_global_transform().affine_inverse() * mouse_pos
-
-	# Restore original position
-	zoom_node.position = original_position
-
-	# Adjust by delta
-	var delta = after - before
-	zoom_node.position += delta
-
-
-
-
-
-	print("Before: ", before)
-	print("After: ", after)
-	print("Delta (unscaled): ", after - before)
+func zoom(zoom_change, mouse_position):
+	zoom_node.scale *= zoom_change
+	var delta_x = (mouse_position.x - zoom_node.global_position.x) * (zoom_change - 1)
+	var delta_y = (mouse_position.y - zoom_node.global_position.y) * (zoom_change - 1)
+	zoom_node.global_position.x -= delta_x
+	zoom_node.global_position.y -= delta_y
