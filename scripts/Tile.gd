@@ -59,7 +59,6 @@ func _gui_input(event):
 		return	# only the controlling peer can cook
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		#set_drag_preview(duplicate())
-		mouse_default_cursor_shape = Control.CURSOR_DRAG
 		print("the drag occurs! unc.")
 		#pass
 		#set_drag_forwarding(this)
