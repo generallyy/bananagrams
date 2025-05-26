@@ -24,6 +24,7 @@ func _process(_delta):
 	sanity_dot.global_position = zoom_node.to_global(world_pos)
 func _ready():
 	print("player board owned by: %s | Am I authority? %s" % [get_multiplayer_authority(), is_multiplayer_authority()])
+	board_state[Vector2i(5, 5)] = "C"
 	draw_visible_grid(Vector2i(0, 0), grid_size)
 	viewport.size = $SubViewportContainer.size
 	print("grid_root's parent is zoom_node? ", grid_root.get_parent() == zoom_node)
@@ -48,7 +49,7 @@ func draw_visible_grid(center: Vector2i, tile_range):
 
 			# Add tile if one is present
 			if board_state.has(pos):
-				var tile = make_tile(board_state[pos])
+				var tile = make_node_tile(board_state[pos])
 				cell.add_child(tile)
 
 func queue_free_children(node: Node):
@@ -57,8 +58,8 @@ func queue_free_children(node: Node):
 
 
 
-func make_tile(letter: String) -> Node:
-	var tile = preload("res://scenes/Tile.tscn").instantiate()
+func make_node_tile(letter: String) -> Node:
+	var tile = preload("res://scenes/NodeTile.tscn").instantiate()
 	tile.letter = letter
 	return tile
 
@@ -75,6 +76,7 @@ func _input(event):
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
 				if is_clicking_tile():
+					print("TILES HAVE BEEN CLICKED")
 					return
 				is_dragging = true
 				drag_start_mouse = event.position
@@ -92,13 +94,13 @@ func _input(event):
 
 
 func is_clicking_tile() -> bool:
-	# legoat https://forum.godotengine.org/t/camera2d-zoom-position-towards-the-mouse/28757/5
 	for tile in get_tree().get_nodes_in_group("draggable_tile"):
-		if tile.is_hovered:
+		if tile.is_mouse_hovering():
 			return true
 	return false
 
 func zoom(zoom_change, mouse_position):
+	# legoat https://forum.godotengine.org/t/camera2d-zoom-position-towards-the-mouse/28757/5
 	zoom_node.scale *= zoom_change
 	var delta_x = (mouse_position.x - zoom_node.global_position.x) * (zoom_change - 1)
 	var delta_y = (mouse_position.y - zoom_node.global_position.y) * (zoom_change - 1)

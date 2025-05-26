@@ -1,0 +1,35 @@
+[gd_scene load_steps=5 format=3 uid="uid://cs6aqvhtbc644"]
+
+[ext_resource type="Script" path="res://scripts/NodeTile.gd" id="1_2bpfk"]
+
+[sub_resource type="SystemFont" id="SystemFont_b6j20"]
+font_names = PackedStringArray("Andale Mono")
+
+[sub_resource type="LabelSettings" id="LabelSettings_cu3t7"]
+font = SubResource("SystemFont_b6j20")
+font_size = 55
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_444jj"]
+size = Vector2(64, 64)
+
+[node name="NodeTile" type="Area2D"]
+script = ExtResource("1_2bpfk")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_right = 64.0
+offset_bottom = 64.0
+color = Color(0.140141, 0.022391, 0.0483121, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+offset_right = 64.0
+offset_bottom = 64.0
+
+[node name="Label" type="Label" parent="CenterContainer"]
+process_mode = 3
+layout_mode = 2
+text = "B"
+label_settings = SubResource("LabelSettings_cu3t7")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(32, 32)
+shape = SubResource("RectangleShape2D_444jj")

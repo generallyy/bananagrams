@@ -18,7 +18,8 @@ func _ready():
 	if has_node("CenterContainer/Label"):
 		$CenterContainer/Label.text = letter
 		
-
+func is_mouse_hovering() -> bool:
+	return is_hovered
 
 
 func _get_drag_data(_at_position: Vector2) -> Variant:

@@ -8,7 +8,7 @@ func _ready():
 
 
 func add_tile(letter: String):
-	var tile = preload("res://scenes/Tile.tscn").instantiate()
+	var tile = preload("res://scenes/ControlTile.tscn").instantiate()
 	tile.letter = letter
 	#move_to_front()
 	

@@ -1,21 +1,21 @@
 [gd_scene load_steps=4 format=3 uid="uid://b7wwg2dlct326"]
 
-[ext_resource type="Script" path="res://scripts/Tile.gd" id="1_r3f4r"]
+[ext_resource type="Script" path="res://scripts/Tile.gd" id="1_pioud"]
 
-[sub_resource type="SystemFont" id="SystemFont_b6j20"]
+[sub_resource type="SystemFont" id="SystemFont_ug2gn"]
 font_names = PackedStringArray("Andale Mono")
 
 [sub_resource type="LabelSettings" id="LabelSettings_75hb6"]
-font = SubResource("SystemFont_b6j20")
+font = SubResource("SystemFont_ug2gn")
 font_size = 55
 
-[node name="Tile" type="Control"]
+[node name="ControlTile" type="Control"]
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 3
 anchors_preset = 0
 offset_right = 64.0
 offset_bottom = 64.0
-script = ExtResource("1_r3f4r")
+script = ExtResource("1_pioud")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 0
