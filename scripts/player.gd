@@ -15,9 +15,10 @@ func _ready():
 		create_board()
 
 func create_board():
-	var tile_rack = preload("res://scenes/TileRack.tscn").instantiate()
-	tile_rack.set_multiplayer_authority(get_multiplayer_authority())  # 👈 this
-	add_child(tile_rack)
+	# moving instantiation to playerboard
+	#var tile_rack = preload("res://scenes/TileRack.tscn").instantiate()
+	#tile_rack.set_multiplayer_authority(get_multiplayer_authority())  # 👈 this
+	#add_child(tile_rack)
 	
 	var board = preload("res://scenes/PlayerBoard.tscn").instantiate()
 	board.set_multiplayer_authority(get_multiplayer_authority())  # 👈 and this

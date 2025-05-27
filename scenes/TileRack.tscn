@@ -1,35 +1,23 @@
-[gd_scene load_steps=3 format=3 uid="uid://bav8flav72ovb"]
+[gd_scene load_steps=4 format=3 uid="uid://bav8flav72ovb"]
 
 [ext_resource type="Script" path="res://scripts/TileRack.gd" id="1_u6lcx"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lpeku"]
-border_width_left = 10
-border_width_top = 10
-border_width_right = 10
-border_width_bottom = 10
-corner_radius_top_left = 20
-corner_radius_top_right = 20
-corner_radius_bottom_right = 20
-corner_radius_bottom_left = 20
+[sub_resource type="SystemFont" id="SystemFont_4ardv"]
+font_names = PackedStringArray("Andale Mono")
 
-[node name="TileRack" type="Control"]
-layout_mode = 3
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_top = -88.0
-offset_bottom = -88.0
-grow_horizontal = 2
-grow_vertical = 0
+[sub_resource type="LabelSettings" id="LabelSettings_kcw4b"]
+font = SubResource("SystemFont_4ardv")
+font_size = 20
+
+[node name="TileRack" type="Node2D"]
+position = Vector2(150, 551)
 script = ExtResource("1_u6lcx")
 
-[node name="PanelContainer" type="PanelContainer" parent="."]
-layout_mode = 0
-offset_right = 64.0
-offset_bottom = 64.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_lpeku")
+[node name="TileLayer" type="Node2D" parent="."]
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer"]
-layout_mode = 2
+[node name="QueueAmount" type="Label" parent="."]
+offset_left = 490.0
+offset_right = 491.0
+offset_bottom = 23.0
+text = "Tiles Queued: 0"
+label_settings = SubResource("LabelSettings_kcw4b")

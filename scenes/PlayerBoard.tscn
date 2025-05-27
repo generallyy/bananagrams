@@ -1,15 +1,16 @@
-[gd_scene load_steps=5 format=3 uid="uid://erjjtd0lijub"]
+[gd_scene load_steps=7 format=3 uid="uid://erjjtd0lijub"]
 
 [ext_resource type="Script" path="res://scripts/PlayerBoard.gd" id="1_pjiff"]
 [ext_resource type="PackedScene" uid="uid://ctdxwxyed58yt" path="res://scenes/Cell.tscn" id="2_jjymn"]
-[ext_resource type="Script" path="res://scripts/DropOverlay.gd" id="3_dpof5"]
+[ext_resource type="PackedScene" uid="uid://bav8flav72ovb" path="res://scenes/TileRack.tscn" id="3_5ua3k"]
+[ext_resource type="PackedScene" uid="uid://mt5xu4fsx1l2" path="res://scenes/DropLogic.tscn" id="3_fs1h7"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1u6sc"]
-bg_color = Color(0.6, 0.596078, 0.592157, 0)
-border_width_left = 5
-border_width_top = 5
-border_width_right = 5
-border_width_bottom = 5
+[sub_resource type="SystemFont" id="SystemFont_q3brd"]
+font_names = PackedStringArray("Andale Mono")
+
+[sub_resource type="Theme" id="Theme_x22qi"]
+default_font = SubResource("SystemFont_q3brd")
+default_font_size = 30
 
 [node name="PlayerBoard" type="Node2D"]
 z_index = -1
@@ -19,7 +20,7 @@ cell_scene = ExtResource("2_jjymn")
 [node name="SubViewportContainer" type="SubViewportContainer" parent="."]
 offset_left = 162.0
 offset_right = 991.0
-offset_bottom = 453.0
+offset_bottom = 648.0
 
 [node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
 disable_3d = true
@@ -40,19 +41,24 @@ offset_right = 40.0
 offset_bottom = 40.0
 color = Color(0.854576, 0, 0.22683, 1)
 
-[node name="PanelContainer" type="PanelContainer" parent="."]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = 159.0
-offset_right = 993.0
-offset_bottom = 455.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_1u6sc")
+[node name="TileRack" parent="SubViewportContainer/SubViewport" instance=ExtResource("3_5ua3k")]
 
-[node name="DropOverlay" type="Control" parent="PanelContainer"]
+[node name="DropLogic" parent="." instance=ExtResource("3_fs1h7")]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_left = 987.0
+offset_top = 38.0
+offset_right = 1148.0
+offset_bottom = 144.0
+theme = SubResource("Theme_x22qi")
+
+[node name="Peel" type="Button" parent="VBoxContainer"]
 layout_mode = 2
-script = ExtResource("3_dpof5")
+text = "PEEL"
+
+[node name="Swap" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "SWAP"
+
+[connection signal="pressed" from="VBoxContainer/Peel" to="." method="_on_peel_pressed"]
+[connection signal="pressed" from="VBoxContainer/Swap" to="." method="_on_swap_pressed"]

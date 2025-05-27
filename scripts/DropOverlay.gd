@@ -8,8 +8,6 @@ var is_dragging_tile = false
 @onready var tile2d_scene = preload("res://scenes/NodeTile.tscn")
 func _ready():
 	set_mouse_filter(MOUSE_FILTER_PASS)
-	print("DropOverlay mouse filter:", mouse_filter)  # Should say "PASS"]
-	print(zoom_container)
 
 
 func _can_drop_data(_pos: Vector2, data: Variant) -> bool:

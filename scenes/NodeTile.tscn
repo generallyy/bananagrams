@@ -13,6 +13,7 @@ font_size = 55
 size = Vector2(64, 64)
 
 [node name="NodeTile" type="Area2D"]
+z_index = 3
 script = ExtResource("1_2bpfk")
 
 [node name="ColorRect" type="ColorRect" parent="."]

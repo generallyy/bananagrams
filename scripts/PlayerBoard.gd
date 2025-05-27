@@ -3,7 +3,7 @@ extends Node2D
 
 
 @export var cell_scene: PackedScene
-var board_state := {}  # Dictionary with Vector2i -> letter
+var board_state := {}  # Dictionary with Vector2i -> Tile
 
 var grid_size := 15  # visible range
 var cell_size := 64  # pixel size
@@ -16,7 +16,7 @@ var drag_start_offset := Vector2.ZERO
 @onready var zoom_node = $SubViewportContainer/SubViewport/ZoomContainer
 @onready var viewport = $SubViewportContainer/SubViewport
 @onready var sanity_dot = zoom_node.get_node("sanity")
-@onready var tile_rack: Control = get_parent().get_node("TileRack")
+@onready var tile_rack = viewport.get_node("TileRack")
 
 func _process(_delta):
 	var mouse_pos = viewport.get_mouse_position()
@@ -24,7 +24,7 @@ func _process(_delta):
 	sanity_dot.global_position = zoom_node.to_global(world_pos)
 func _ready():
 	print("player board owned by: %s | Am I authority? %s" % [get_multiplayer_authority(), is_multiplayer_authority()])
-	board_state[Vector2i(5, 5)] = "C"
+	board_state[Vector2i(5, 5)] = make_node_tile("C")
 	draw_visible_grid(Vector2i(0, 0), grid_size)
 	viewport.size = $SubViewportContainer.size
 	print("grid_root's parent is zoom_node? ", grid_root.get_parent() == zoom_node)
@@ -35,7 +35,7 @@ func _ready():
 	tile_rack.add_tile("D")
 	tile_rack.add_tile("B")
 
-func draw_visible_grid(center: Vector2i, tile_range):
+func draw_visible_grid(center: Vector2i = Vector2i(0, 0), tile_range = grid_size):
 	queue_free_children(grid_root)
 
 	for x in tile_range * 2:
@@ -48,15 +48,16 @@ func draw_visible_grid(center: Vector2i, tile_range):
 			grid_root.add_child(cell)
 
 			# Add tile if one is present
+			# i surmise this is quite cheeky
 			if board_state.has(pos):
-				var tile = make_node_tile(board_state[pos])
-				cell.add_child(tile)
+				var original_tile = board_state[pos]
+				var visual_tile = original_tile.duplicate()
+				visual_tile.set_meta("origin_tile", original_tile)
+				cell.add_child(visual_tile)
 
 func queue_free_children(node: Node):
 	for child in node.get_children():
 		child.queue_free()
-
-
 
 func make_node_tile(letter: String) -> Node:
 	var tile = preload("res://scenes/NodeTile.tscn").instantiate()
@@ -106,3 +107,14 @@ func zoom(zoom_change, mouse_position):
 	var delta_y = (mouse_position.y - zoom_node.global_position.y) * (zoom_change - 1)
 	zoom_node.global_position.x -= delta_x
 	zoom_node.global_position.y -= delta_y
+
+
+func _on_peel_pressed():
+	# one day we'll put a check in here
+	tile_rack.add_tile("W")
+	
+	pass # Replace with function body.
+
+
+func _on_swap_pressed():
+	pass # Replace with function body.
