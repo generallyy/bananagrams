@@ -7,7 +7,7 @@ var peer = ENetMultiplayerPeer.new()
 @onready var top_label = $Label
 @onready var right_panel = $PeersPanel/MarginContainer/PanelNames
 @onready var name_field = get_node("Start Menu/VBoxContainer/NameField")
-var player_names = {}
+var player_names = {} # dict of id : name
 var next_default_name = 1
 
 
@@ -107,7 +107,7 @@ func _finalize_add_player(player, id):
 
 	update_player_ui()
 
-	
+
 @rpc("any_peer")
 func send_name_to_host(player_name: String):
 	if multiplayer.is_server(): 	#register as host.
@@ -137,3 +137,5 @@ func broadcast_name_to_all(id: int, player_name: String):
 func _on_player_disconnected(id):
 	player_names.erase(id)
 	update_player_ui()
+
+
