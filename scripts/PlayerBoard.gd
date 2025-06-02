@@ -47,7 +47,7 @@ func _ready():
 	tile_rack.add_tile("A")
 
 	if multiplayer.get_unique_id() != get_multiplayer_authority():
-		$VBoxContainer/Peel.visible = false  # or .disabled = true
+		$VBoxContainer/Swap.visible = false  # or .disabled = true
 
 	else:
 		print("I am the authority of this PlayerBoard. Peel is active.")
@@ -140,6 +140,7 @@ func _on_peel_pressed():
 	print("🟡 Attempting to request peel from host")
 
 	if not multiplayer.is_server():
+		print("the rpc went through")
 		rpc_id(1, "request_peel")
 	else:
 		request_peel()
@@ -149,11 +150,14 @@ func _on_swap_pressed():
 	print(get_multiplayer_authority(), " ", is_multiplayer_authority())
 	pass # Replace with function body.
 
-@rpc("authority")
+@rpc("any_peer")	# this is so weird. authority == get_multiplayer_authority, authority != host
 func request_peel():
 	var sender_id = multiplayer.get_remote_sender_id()
 	if sender_id == 0:
 		sender_id = 1
+	
+	print("authority: ", get_multiplayer_authority())
+	print("multiplayer_is_server: ", multiplayer.is_server())
 	
 	# Host pulls one tile for each player
 	for peer_id in multiplayer.get_peers():
