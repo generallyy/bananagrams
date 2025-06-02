@@ -69,6 +69,7 @@ func update_player_ui():
 		label.text = player_names.get(id, "Player %d" % id)
 		right_panel.add_child(label)
 
+
 func _sort_by_player_name(a, b) -> bool:
 	return player_names.get(a, "").to_lower() < player_names.get(b, "").to_lower()
 
@@ -77,7 +78,7 @@ func _add_player(id = 1):
 	if has_node(str(id)):
 		print("Player %d already added; skipping" % id)
 		return
-	print("++ Adding Player %d (mine? %s)" % [id, id == multiplayer.get_unique_id()])
+	print("++ Adding Player %d (to Player %d)" % [id, multiplayer.get_unique_id()])
 
 
 	var player = player_scene.instantiate()

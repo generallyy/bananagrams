@@ -21,7 +21,8 @@ func add_tile(letter: String):
 func _spawn_tile(letter: String):
 	var tile = preload("res://scenes/NodeTile.tscn").instantiate()
 	tile.letter = letter
-	tile.set_multiplayer_authority(multiplayer.get_unique_id())
+	#tile.set_multiplayer_authority(multiplayer.get_unique_id())
+	tile.set_multiplayer_authority(get_multiplayer_authority())
 
 	var index = get_first_null(rack)	# should hypothetically never be -1
 	#print("index: %d" % index)

@@ -25,11 +25,12 @@ func _process(_delta):
 	sanity_dot.global_position = zoom_node.to_global(world_pos)
 
 # rpc test
-@rpc("call_local")
+@rpc("any_peer", "call_local")
 func shout(msg):
 	print("someone says: ", msg)
 
 func _ready():
+	modulate.a = .5
 	if multiplayer.is_server():
 		rpc("shout", "hello from the host!")
 	print("unique id: ", multiplayer.get_unique_id())
@@ -39,10 +40,20 @@ func _ready():
 	viewport.size = $SubViewportContainer.size
 	#print("grid_root's parent is zoom_node? ", grid_root.get_parent() == zoom_node)
 
-	if multiplayer.is_server():
+	if multiplayer.is_server() and get_multiplayer_authority() == 1:
+		print("generating tile pool")
 		tile_pool = generate_tile_pool()
 	# THIS IS VERY TEMPORARY OKAY
 	tile_rack.add_tile("A")
+
+	if multiplayer.get_unique_id() != get_multiplayer_authority():
+		$VBoxContainer/Peel.visible = false  # or .disabled = true
+
+	else:
+		print("I am the authority of this PlayerBoard. Peel is active.")
+	add_to_group("player_board")
+	
+	
 
 
 func draw_visible_grid(center: Vector2i = Vector2i(0, 0), tile_range = grid_size):
@@ -71,6 +82,7 @@ func queue_free_children(node: Node):
 
 func make_node_tile(letter: String) -> Node:
 	var tile = preload("res://scenes/NodeTile.tscn").instantiate()
+	tile.set_multiplayer_authority(get_multiplayer_authority())
 	tile.letter = letter
 	return tile
 
@@ -117,14 +129,25 @@ func zoom(zoom_change, mouse_position):
 	var delta_y = (mouse_position.y - zoom_node.global_position.y) * (zoom_change - 1)
 	zoom_node.global_position.x -= delta_x
 	zoom_node.global_position.y -= delta_y
+	
+	print("initializing player board.")
+	for board in get_tree().get_nodes_in_group("player_board"):
+		print("Found PlayerBoard: ", board.name)
 
 
 func _on_peel_pressed():
 	# one day we'll put a check in here
+	print("🟡 Attempting to request peel from host")
+
 	if not multiplayer.is_server():
 		rpc_id(1, "request_peel")
 	else:
 		request_peel()
+
+func _on_swap_pressed():
+	print("swap is being pressed")
+	print(get_multiplayer_authority(), " ", is_multiplayer_authority())
+	pass # Replace with function body.
 
 @rpc("authority")
 func request_peel():
@@ -137,19 +160,19 @@ func request_peel():
 		if tile_pool.size() == 0:
 			break
 		var tile = tile_pool.pop_back()
-		rpc_id(peer_id, "give_tile", tile)
+		
+		# get teh board node for this peer and call rpc on it?
+		var board_node = get_node("/root/Main/%s/Board_%s" % [peer_id, peer_id])
+		board_node.rpc_id(peer_id, "give_tile", tile)
 	
 	# give host a tile, too :)
 	if (tile_pool.size() != 0):
-		give_tile(tile_pool.pop_back())
+		var host_board = get_node("/root/Main/1/Board_1")
+		host_board.give_tile(tile_pool.pop_back())
 
 @rpc("any_peer")
 func give_tile(tile):
 	tile_rack.add_tile(tile)
-
-
-func _on_swap_pressed():
-	pass # Replace with function body.
 
 ## helper function
 func add_letter(pool: Array, letter: String, count: int) -> void:

@@ -92,9 +92,5 @@ grow_vertical = 2
 text = "empty (label)"
 horizontal_alignment = 1
 
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://scenes/player.tscn")
-spawn_path = NodePath("..")
-
 [connection signal="pressed" from="Start Menu/VBoxContainer/HBoxContainer/host" to="." method="_on_host_pressed"]
 [connection signal="pressed" from="Start Menu/VBoxContainer/HBoxContainer/join" to="." method="_on_join_pressed"]
