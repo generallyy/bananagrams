@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=3 uid="uid://brvtubuhsvnjt"]
 
 [ext_resource type="Script" path="res://scripts/Main.gd" id="1_c455u"]
-[ext_resource type="PackedScene" uid="uid://d0d32oahjs3ed" path="res://scenes/Player.tscn" id="2_bosci"]
+[ext_resource type="PackedScene" uid="uid://d0d32oahjs3ed" path="res://scenes/player.tscn" id="2_bosci"]
 
 [sub_resource type="SystemFont" id="SystemFont_m3p4o"]
 font_names = PackedStringArray("Andale Mono")
@@ -59,6 +59,21 @@ layout_mode = 2
 placeholder_text = "name"
 alignment = 1
 max_length = 10
+
+[node name="GamePanel" type="VBoxContainer" parent="."]
+layout_mode = 2
+offset_left = 933.0
+offset_top = 58.0
+offset_right = 1082.0
+offset_bottom = 148.0
+
+[node name="Peel" type="Button" parent="GamePanel"]
+layout_mode = 2
+text = "Peel"
+
+[node name="Swap" type="Button" parent="GamePanel"]
+layout_mode = 2
+text = "Swap"
 
 [node name="PeersPanel" type="VBoxContainer" parent="."]
 layout_mode = 1
