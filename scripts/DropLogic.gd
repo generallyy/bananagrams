@@ -37,12 +37,9 @@ func _snap_tile_to_board(tile: Area2D):
 	var board_index = Vector2i(snapped_pos / cell_size)
 
 	# Remove old position from board_state
-	if tile.has_meta("origin_tile"):	# because only board tiles have meta data
-		var origin = tile.get_meta("origin_tile")
-		for pos in board.board_state.keys():
-			if board.board_state[pos] == origin:
-				board.board_state.erase(pos)
-				break
+	if tile.has_meta("origin_pos"):	# because only board tiles have meta data
+		var origin_pos = tile.get_meta("origin_pos")
+		board.board_state.erase(origin_pos)
 
 	# Remove from tile rack if it's there
 	if tile.get_parent() == board.tile_rack.tile_layer:

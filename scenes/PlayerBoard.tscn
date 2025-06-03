@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://erjjtd0lijub"]
+[gd_scene load_steps=11 format=3 uid="uid://erjjtd0lijub"]
 
 [ext_resource type="Script" path="res://scripts/PlayerBoard.gd" id="1_pjiff"]
 [ext_resource type="PackedScene" uid="uid://ctdxwxyed58yt" path="res://scenes/Cell.tscn" id="2_jjymn"]
@@ -11,6 +11,20 @@ font_names = PackedStringArray("Andale Mono")
 [sub_resource type="Theme" id="Theme_x22qi"]
 default_font = SubResource("SystemFont_q3brd")
 default_font_size = 30
+
+[sub_resource type="SystemFont" id="SystemFont_vvkwx"]
+font_names = PackedStringArray("Andale Mono")
+
+[sub_resource type="Theme" id="Theme_wikn8"]
+default_font = SubResource("SystemFont_vvkwx")
+default_font_size = 30
+
+[sub_resource type="SystemFont" id="SystemFont_4iscs"]
+font_names = PackedStringArray("Andale Mono")
+
+[sub_resource type="Theme" id="Theme_7v6c1"]
+default_font = SubResource("SystemFont_4iscs")
+default_font_size = 22
 
 [node name="PlayerBoard" type="Node2D"]
 z_index = -1
@@ -59,5 +73,21 @@ text = "PEEL"
 [node name="Swap" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 text = "SWAP"
+
+[node name="MsgBox" type="Label" parent="."]
+offset_top = 137.0
+offset_right = 1152.0
+offset_bottom = 172.0
+theme = SubResource("Theme_wikn8")
+text = "message box! not that you'll see this."
+horizontal_alignment = 1
+
+[node name="TileCount" type="Label" parent="."]
+offset_left = 782.0
+offset_top = 63.0
+offset_right = 925.0
+offset_bottom = 108.0
+theme = SubResource("Theme_7v6c1")
+text = "Tiles Left:"
 
 [connection signal="pressed" from="VBoxContainer/Swap" to="." method="_on_swap_pressed"]
