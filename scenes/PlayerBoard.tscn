@@ -60,5 +60,4 @@ text = "PEEL"
 layout_mode = 2
 text = "SWAP"
 
-[connection signal="pressed" from="VBoxContainer/Peel" to="." method="_on_peel_pressed"]
 [connection signal="pressed" from="VBoxContainer/Swap" to="." method="_on_swap_pressed"]
