@@ -16,6 +16,8 @@ var drag_start_offset := Vector2.ZERO
 @onready var grid_root = $SubViewportContainer/SubViewport/ZoomContainer/GridCells
 @onready var zoom_node = $SubViewportContainer/SubViewport/ZoomContainer
 @onready var viewport = $SubViewportContainer/SubViewport
+@onready var peel_button = $VBoxContainer/Peel
+@onready var swap_button = $VBoxContainer/Swap
 @onready var sanity_dot = zoom_node.get_node("sanity")
 @onready var tile_rack = viewport.get_node("TileRack")
 
@@ -24,15 +26,8 @@ func _process(_delta):
 	var world_pos = zoom_node.get_global_transform().affine_inverse() * mouse_pos
 	sanity_dot.global_position = zoom_node.to_global(world_pos)
 
-# rpc test
-@rpc("any_peer", "call_local")
-func shout(msg):
-	print("someone says: ", msg)
-
 func _ready():
-	modulate.a = .5
-	if multiplayer.is_server():
-		rpc("shout", "hello from the host!")
+	#modulate.a = .5
 	print("unique id: ", multiplayer.get_unique_id())
 	#print("player board owned by: %s | Am I authority? %s" % [get_multiplayer_authority(), is_multiplayer_authority()])
 	board_state[Vector2i(5, 5)] = make_node_tile("C")
@@ -46,12 +41,20 @@ func _ready():
 	# THIS IS VERY TEMPORARY OKAY
 	tile_rack.add_tile("A")
 
-	if multiplayer.get_unique_id() != get_multiplayer_authority():
-		$VBoxContainer/Swap.visible = false  # or .disabled = true
-
-	else:
-		print("I am the authority of this PlayerBoard. Peel is active.")
-	add_to_group("player_board")
+	if get_multiplayer_authority() != multiplayer.get_unique_id():
+		print(">> visibility disabled for board %d on player %d's screen." % [get_multiplayer_authority(), multiplayer.get_unique_id()])
+		visible = false
+	print("peel: ", peel_button.disabled, " ", peel_button.is_visible_in_tree())
+	peel_button.name = "Peel_%s" % get_multiplayer_authority()
+	print(peel_button.name)
+	peel_button.connect("pressed", _on_peel_pressed)
+	
+	#if multiplayer.get_unique_id() != get_multiplayer_authority():
+		#visible = false
+#
+	#else:
+		#print("I am the authority of this PlayerBoard. Peel is active.")
+	#add_to_group("player_board")
 	
 	
 
@@ -64,6 +67,7 @@ func draw_visible_grid(center: Vector2i = Vector2i(0, 0), tile_range = grid_size
 			var pos = center + Vector2i(x - tile_range, y - tile_range)
 
 			var cell = cell_scene.instantiate()
+			cell.set_multiplayer_authority(get_multiplayer_authority())		# teehee
 			cell.board = self
 			cell.position = pos * cell_size
 			grid_root.add_child(cell)
@@ -129,30 +133,39 @@ func zoom(zoom_change, mouse_position):
 	var delta_y = (mouse_position.y - zoom_node.global_position.y) * (zoom_change - 1)
 	zoom_node.global_position.x -= delta_x
 	zoom_node.global_position.y -= delta_y
-	
-	print("initializing player board.")
-	for board in get_tree().get_nodes_in_group("player_board"):
-		print("Found PlayerBoard: ", board.name)
 
 
 func _on_peel_pressed():
 	# one day we'll put a check in here
 	print("🟡 Attempting to request peel from host")
+	request_peel.rpc_id(1)  # Tell the host who asked
 
-	if not multiplayer.is_server():
-		print("the rpc went through")
-		rpc_id(1, "request_peel")
-	else:
-		request_peel()
-
+#
 func _on_swap_pressed():
 	print("swap is being pressed")
-	print(get_multiplayer_authority(), " ", is_multiplayer_authority())
+	print("get authority and is authority: ", get_multiplayer_authority(), " ", is_multiplayer_authority())
 	pass # Replace with function body.
 
-@rpc("any_peer")	# this is so weird. authority == get_multiplayer_authority, authority != host
+@rpc("any_peer", "call_local")
 func request_peel():
+	print("📩 request_peel() called on peer ID:", multiplayer.get_unique_id(), ", is_server:", multiplayer.is_server())
+
+	print(get_path())
+	if not multiplayer.is_server():
+		print(">>>> YOU HAVE PROBLEMS <<<<")
+	else:
+		var board = get_node("/root/Main/1/Board_1")
+		print(board)
+		board.host_request_peel()
+
+@rpc("authority")	# this is so weird. authority == get_multiplayer_authority, authority != host
+func host_request_peel():
+	print("📩 request_peel() called on peer ID:", multiplayer.get_unique_id(), ", is_server:", multiplayer.is_server())
+	#if get_multiplayer_authority() != 1:
+		#print("⛔ Only the host should run this.")
+		#return		# was that it?
 	var sender_id = multiplayer.get_remote_sender_id()
+	
 	if sender_id == 0:
 		sender_id = 1
 	
@@ -162,6 +175,7 @@ func request_peel():
 	# Host pulls one tile for each player
 	for peer_id in multiplayer.get_peers():
 		if tile_pool.size() == 0:
+			print("bag empty!")
 			break
 		var tile = tile_pool.pop_back()
 		
@@ -185,28 +199,32 @@ func add_letter(pool: Array, letter: String, count: int) -> void:
 
 func generate_tile_pool() -> Array:
 	var pool = []
-
-	for l in ["J", "K", "Q", "X", "Z"]:
-		add_letter(pool, l, 2)
-
-	for l in ["B", "C", "F", "H", "M", "P", "V", "W", "Y"]:
-		add_letter(pool, l, 3)
-
-	add_letter(pool, "G", 4)
-	add_letter(pool, "L", 5)
-
-	for l in ["D", "S", "U"]:
-		add_letter(pool, l, 6)
-
-	add_letter(pool, "N", 8)
-
-	for l in ["T", "R"]:
-		add_letter(pool, l, 9)
-
-	add_letter(pool, "O", 11)
-	add_letter(pool, "I", 12)
-	add_letter(pool, "A", 13)
-	add_letter(pool, "E", 18)
+	
+	# this is just testing lol
+	for l in ["E", "D", "C", "B", "A"]:
+		add_letter(pool, l, 1)
+#
+	#for l in ["J", "K", "Q", "X", "Z"]:
+		#add_letter(pool, l, 2)
+#
+	#for l in ["B", "C", "F", "H", "M", "P", "V", "W", "Y"]:
+		#add_letter(pool, l, 3)
+#
+	#add_letter(pool, "G", 4)
+	#add_letter(pool, "L", 5)
+#
+	#for l in ["D", "S", "U"]:
+		#add_letter(pool, l, 6)
+#
+	#add_letter(pool, "N", 8)
+#
+	#for l in ["T", "R"]:
+		#add_letter(pool, l, 9)
+#
+	#add_letter(pool, "O", 11)
+	#add_letter(pool, "I", 12)
+	#add_letter(pool, "A", 13)
+	#add_letter(pool, "E", 18)
 
 	pool.shuffle()
 	return pool

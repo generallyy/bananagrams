@@ -2,13 +2,17 @@
 extends Control
 
 var peer = ENetMultiplayerPeer.new()
-@export var player_scene: PackedScene
+#@export var player_scene: PackedScene
 @onready var start_menu = get_node("Start Menu")
 @onready var top_label = $Label
 @onready var right_panel = $PeersPanel/MarginContainer/PanelNames
 @onready var name_field = get_node("Start Menu/VBoxContainer/NameField")
+
 var player_names = {} # dict of id : name
 var next_default_name = 1
+
+var connected_peer_ids = []
+var local_player_character
 
 
 #func _ready():
@@ -16,36 +20,52 @@ var next_default_name = 1
 
 
 func _on_host_pressed():
+	start_menu.visible = false
 	peer.create_server(135)
-	on_join_setup()
+	multiplayer.multiplayer_peer = peer
+	
+	add_player_character()
+	
+	peer.peer_connected.connect(
+	func(new_peer_id):
+		#await get_tree().create_timer(1).timeout
+		rpc("add_newly_connected_player_character", new_peer_id)
+		rpc_id(new_peer_id, "add_previously_connected_player_characters", connected_peer_ids)
+		add_player_character(new_peer_id)
+	)
 
 func _on_join_pressed():
-	if not multiplayer.connected_to_server.is_connected(_on_connected_to_server):
-		multiplayer.connected_to_server.connect(_on_connected_to_server)
-
+	start_menu.visible = false
 	peer.create_client("localhost", 135)
 	multiplayer.multiplayer_peer = peer
 
-func _on_connected_to_server():
-	multiplayer.connected_to_server.disconnect(_on_connected_to_server)
-	on_join_setup()
 
-# things that both host and client must do. 
-func on_join_setup():
-	start_menu.visible = false
-	if not multiplayer.peer_connected.is_connected(_add_player):
-		multiplayer.peer_connected.connect(_add_player)
-	if not multiplayer.peer_disconnected.is_connected(_on_player_disconnected):
-		multiplayer.peer_disconnected.connect(_on_player_disconnected)
-	
-	var my_id = peer.get_unique_id()
-	_add_player(my_id)  # So your own board appears!
 
-	multiplayer.multiplayer_peer = peer
+func add_player_character(peer_id = 1):
+	connected_peer_ids.append(peer_id)
+	var player_character = preload("res://scenes/player.tscn").instantiate()
+	player_character.set_multiplayer_authority(peer_id)
+	add_child(player_character)
+	if peer_id == multiplayer.get_unique_id():
+		local_player_character = player_character
 
 	var player_name = name_field.text.strip_edges()
 	send_name_to_host(player_name)
 
+	#print_tree_pretty()
+
+@rpc
+func add_newly_connected_player_character(new_peer_id):
+	add_player_character(new_peer_id)
+
+@rpc
+func add_previously_connected_player_characters(peer_ids):
+	for peer_id in peer_ids:
+		add_player_character(peer_id)
+
+# outdated stuff ig
+
+# things that both host and client must do. 
 	
 func update_player_ui():
 	var my_id = multiplayer.get_unique_id()
@@ -73,41 +93,6 @@ func update_player_ui():
 func _sort_by_player_name(a, b) -> bool:
 	return player_names.get(a, "").to_lower() < player_names.get(b, "").to_lower()
 
-func _add_player(id = 1):
-	print("----------------- ADDING PLAYER ------------------")
-	if has_node(str(id)):
-		print("Player %d already added; skipping" % id)
-		return
-	print("++ Adding Player %d (to Player %d)" % [id, multiplayer.get_unique_id()])
-
-
-	var player = player_scene.instantiate()
-	player.name = str(id)
-	if id == multiplayer.get_unique_id():
-		player.set_multiplayer_authority(id)  # ✅ before add_child
-	call_deferred("_finalize_add_player", player, id)
-	
-	# If I'm the host and this is not me, send all existing names to the new guy
-	#bug fix#
-	# this is so that the player only creates the board for himself.
-	#if multiplayer.is_server() and id != multiplayer.get_unique_id():
-		#for other_id in player_names.keys():
-			#if other_id != id:
-				#broadcast_name_to_all.rpc_id(id, other_id, player_names[other_id])  # tell the new player
-	#update_player_ui()
-	
-func _finalize_add_player(player, id):
-	add_child(player)
-	await get_tree().process_frame
-
-	# Send name sync info from host to new peer
-	if multiplayer.is_server() and id != multiplayer.get_unique_id():
-		for other_id in player_names.keys():
-			if other_id != id:
-				broadcast_name_to_all.rpc_id(id, other_id, player_names[other_id])
-
-	update_player_ui()
-
 
 @rpc("any_peer")
 func send_name_to_host(player_name: String):
@@ -116,8 +101,11 @@ func send_name_to_host(player_name: String):
 		if sender_id == 0:
 			sender_id = multiplayer.get_unique_id()
 		
+		
+		if player_names.has(sender_id):
+			player_name = player_names.get(sender_id)
 		if player_name.is_empty():
-			player_name = "Player %d" % (player_names.size() + 1)
+			player_name = "Player %d" % (next_default_name)
 			next_default_name += 1
 		# store and send names
 		player_names[sender_id] = player_name
@@ -135,8 +123,8 @@ func broadcast_name_to_all(id: int, player_name: String):
 	player_names[id] = player_name
 	update_player_ui()
 
-func _on_player_disconnected(id):
-	player_names.erase(id)
-	update_player_ui()
+#func _on_player_disconnected(id):
+	#player_names.erase(id)
+	#update_player_ui()
 
 
