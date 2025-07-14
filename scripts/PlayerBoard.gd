@@ -14,6 +14,7 @@ var drag_start_offset := Vector2.ZERO
 
 var tryna_swap = false
 var tilect = 0
+var word_dict = {}
 
 @onready var grid_root = $SubViewportContainer/SubViewport/ZoomContainer/GridCells
 @onready var zoom_node = $SubViewportContainer/SubViewport/ZoomContainer
@@ -24,6 +25,7 @@ var tilect = 0
 @onready var tile_count = $TileCount
 @onready var sanity_dot = zoom_node.get_node("sanity")
 @onready var tile_rack = viewport.get_node("TileRack")
+
 
 func _process(_delta):
 	var mouse_pos = viewport.get_mouse_position()
@@ -50,6 +52,9 @@ func _ready():
 	#peel_button.name = "Peel_%s" % get_multiplayer_authority()
 	peel_button.connect("pressed", _on_peel_pressed)
 	msgbox.visible = false
+	
+	var dict_filepath = "res://assets/dict.txt"
+	load_dictionary_from_file(dict_filepath)
 	
 
 
@@ -135,8 +140,17 @@ func zoom(zoom_change, mouse_position):
 
 func _on_peel_pressed():
 	# one day we'll put a check in here
-	print("🟡 Attempting to request peel from host")
-	request_peel.rpc_id(1)  # Tell the host who asked
+	# WE FINNA PUT THE CHECK HERE FRFR
+	if verify_board():
+		print("🟡 Attempting to request peel from host")
+		request_peel.rpc_id(1)  # Tell the host who asked
+	else:
+		msgbox.text = "invalid board"
+		msgbox.visible = true
+		await get_tree().create_timer(1.0).timeout
+		
+		msgbox.visible = false
+
 
 #
 func _on_swap_pressed():
@@ -253,6 +267,72 @@ func host_request_peel():
 		host_board.give_tile(tile_pool.pop_back())
 	
 	host_update_tile_count()
+
+
+func get_all_words() -> Array:
+	var words = []
+	var checked_h = {}
+	var checked_v = {}
+	
+	for pos in board_state.keys():
+		
+		# check horizontal word
+		if not checked_h.has(pos) and not board_state.has(pos + Vector2i.LEFT):
+			var horiz = get_word_from(pos, Vector2i.RIGHT)
+			if horiz.size () > 1:
+				words.append(get_word_string(horiz))
+				for p in horiz:
+					checked_h[p] = true
+												# putting this in getwordfrom might be better?
+		if not checked_v.has(pos) and not board_state.has(pos + Vector2i.UP):
+			var vert = get_word_from(pos, Vector2i.DOWN)
+			if vert.size() > 1:
+				words.append(get_word_string(vert))
+				for p in vert:
+					checked_v[p] = true
+	print("words from get all words:", words)
+	return words
+
+func get_word_from(start: Vector2i, dir: Vector2i) -> Array:
+	var word_positions = []
+	var current = start
+
+	while board_state.has(current):
+		word_positions.append(current)
+		current += dir
+
+	return word_positions
+
+func get_word_string(word_positions: Array) -> String:
+	var word = ""
+	for pos in word_positions:
+		word += board_state[pos].letter
+	return word
+
+func verify_board() -> bool:
+	for word in get_all_words():
+		if not word_dict.has(word.to_upper()):
+			print("❌ Invalid word:", word)
+			return false
+	print("valid board!")
+	return true
+
+func load_dictionary_from_file(filepath: String):
+	var file = FileAccess.open(filepath, FileAccess.READ)
+	if file:
+		print("Loading dictionary from: %s" % filepath)
+		while not file.eof_reached():
+			var line = file.get_line()
+			var word = line.strip_edges().to_upper()
+			if not word == "":
+				word_dict[word] = true
+		
+		file.close()
+		print("Dict loaded with %d words." % word_dict.size())
+	else:
+		printerr("err: could not open dict file at %s"  % filepath)
+	
+
 
 ## should only be called by authority = 1, is_server(). rpcs the tile count to everyone else to adjust.
 func host_update_tile_count():
