@@ -23,9 +23,11 @@ func _try_snap_hovered_tile():
 
 	# Find the tile currently hovered
 	for tile in get_tree().get_nodes_in_group("draggable_tile"):
-		if tile is Area2D and tile.has_method("is_mouse_hovering") and tile.is_mouse_hovering():
-			_snap_tile_to_board(tile)
-			break  # Only snap one tile at a time
+		#if tile is Area2D and tile.has_method("is_mouse_hovering") and tile.is_mouse_hovering():
+		# don't need all that
+		if tile.is_mouse_hovering() and tile.dragging:
+				_snap_tile_to_board(tile)
+				break  # Only snap one tile at a time 
 
 func _snap_tile_to_board(tile: Area2D):
 	var letter = tile.letter
@@ -35,6 +37,34 @@ func _snap_tile_to_board(tile: Area2D):
 	var local_mouse_pos = zoom_container.get_local_mouse_position()
 	var snapped_pos = (local_mouse_pos / cell_size).floor() * cell_size
 	var board_index = Vector2i(snapped_pos / cell_size)
+	
+	# if there's a tile beneath that tile
+	for other_tile in get_tree().get_nodes_in_group("draggable_tile"):
+		if other_tile.is_mouse_hovering() and not other_tile.dragging:
+			# other_tile will be on the board, and therefore have meta data.
+			# case 1: tile is on board.
+			#			so, swap the positions on the board.
+			if tile.has_meta("origin_pos"):	# because only board tiles have meta data
+				var origin_pos = tile.get_meta("origin_pos")
+				board.board_state[origin_pos] = board.make_node_tile(other_tile.letter)
+						# this may not have to be that complicated..?
+			# case 2: tile is in rack.
+			#			so, remove other_tile from board and add it to rack.
+			if tile.get_parent() == board.tile_rack.tile_layer:
+				# case 3: other_tile is ALSO in the tile rack.
+				if other_tile.get_parent() == board.tile_rack.tile_layer:
+					board.tile_rack.remove_tile(tile)
+					board.tile_rack.add_tile(tile.letter)
+					return # ?
+				board.tile_rack.remove_tile(tile)
+				board.board_state.erase(other_tile.get_meta("origin_pos"))
+				board.tile_rack.add_tile(other_tile.letter)
+			
+			board.board_state[board_index] = board.make_node_tile(letter)
+			board.draw_visible_grid()
+			print("🟢 Two Tiles:    ", letter, " to ", board_index)
+			return  # should only be one
+	
 
 	# Remove old position from board_state
 	if tile.has_meta("origin_pos"):	# because only board tiles have meta data
@@ -51,4 +81,4 @@ func _snap_tile_to_board(tile: Area2D):
 
 	board.board_state[board_index] = board.make_node_tile(letter)
 	board.draw_visible_grid()
-	print("🟢 Dropped tile:", letter, "to", board_index)
+	print("🟢 Dropped tile: ", letter, " to ", board_index)

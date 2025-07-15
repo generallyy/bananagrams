@@ -18,6 +18,12 @@ func add_tile(letter: String):
 		rack_queue.append(letter)
 		update_queue_label()
 
+func is_empty():
+	for tile in rack:
+		if tile != null:
+			return false
+	return true
+
 func _spawn_tile(letter: String):
 	var tile = preload("res://scenes/NodeTile.tscn").instantiate()
 	tile.letter = letter
@@ -45,9 +51,7 @@ func remove_tile(tile: Node):
 		if index != -1:
 			rack[index] = null
 			tile_layer.remove_child(tile)
-		
-		
-		
+			
 			# If there's something in the queue, add it now
 			if rack_queue.size() > 0:
 				var next_letter = rack_queue.pop_front()

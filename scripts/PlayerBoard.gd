@@ -36,7 +36,7 @@ func _ready():
 	#modulate.a = .5
 	print("unique id: ", multiplayer.get_unique_id())
 	#print("player board owned by: %s | Am I authority? %s" % [get_multiplayer_authority(), is_multiplayer_authority()])
-	board_state[Vector2i(5, 5)] = make_node_tile("C")
+	#board_state[Vector2i(5, 5)] = make_node_tile("C")
 	draw_visible_grid(Vector2i(0, 0), grid_size)
 	viewport.size = $SubViewportContainer.size
 
@@ -45,7 +45,9 @@ func _ready():
 		tile_pool = generate_tile_pool()
 		host_update_tile_count()
 	# THIS IS VERY TEMPORARY OKAY
-	tile_rack.add_tile("A")
+	#tile_rack.add_tile("A")
+	for i in range(7):
+		request_peel()
 
 	if get_multiplayer_authority() != multiplayer.get_unique_id():
 		visible = false
@@ -137,20 +139,26 @@ func zoom(zoom_change, mouse_position):
 	zoom_node.global_position.x -= delta_x
 	zoom_node.global_position.y -= delta_y
 
+func setMsgBox(text: String):
+	msgbox.text = text
+	msgbox.visible = true
+	await get_tree().create_timer(1.0).timeout
+	
+	msgbox.visible = false
 
 func _on_peel_pressed():
 	# one day we'll put a check in here
 	# WE FINNA PUT THE CHECK HERE FRFR
-	if verify_board():
+	if not tile_rack.is_empty():
+		setMsgBox("tile rack not empty!")
+	elif not verify_board():
+		#setMsgBox("invalid board")
+		pass
+	elif not is_board_connected():
+		setMsgBox("board not connected.")
+	else:
 		print("🟡 Attempting to request peel from host")
 		request_peel.rpc_id(1)  # Tell the host who asked
-	else:
-		msgbox.text = "invalid board"
-		msgbox.visible = true
-		await get_tree().create_timer(1.0).timeout
-		
-		msgbox.visible = false
-
 
 #
 func _on_swap_pressed():
@@ -312,10 +320,39 @@ func get_word_string(word_positions: Array) -> String:
 func verify_board() -> bool:
 	for word in get_all_words():
 		if not word_dict.has(word.to_upper()):
-			print("❌ Invalid word:", word)
+			setMsgBox("❌ Invalid word: %s" % word)
+			#print("❌ Invalid word:", word)
 			return false
 	print("valid board!")
 	return true
+
+func is_board_connected() -> bool:
+	if board_state.is_empty():
+		return true  # or false, depending on your game rules
+
+	var visited = {}
+	var to_visit = []
+
+	# Start from one arbitrary tile
+	var start_pos = board_state.keys()[0]
+	to_visit.append(start_pos)
+	visited[start_pos] = true
+
+	while to_visit.size() > 0:
+		var current = to_visit.pop_back()
+
+		# Explore 4 directions
+		for dir in [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]:
+			var neighbor = current + dir
+			if board_state.has(neighbor) and not visited.has(neighbor):
+				visited[neighbor] = true
+				to_visit.append(neighbor)
+
+	# If we visited all tiles, the board is connected
+	if visited.size() == board_state.size():
+		print("board is connected!")
+	return visited.size() == board_state.size()
+
 
 func load_dictionary_from_file(filepath: String):
 	var file = FileAccess.open(filepath, FileAccess.READ)
