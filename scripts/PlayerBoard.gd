@@ -35,28 +35,35 @@ func _process(_delta):
 func _ready():
 	#modulate.a = .5
 	print("unique id: ", multiplayer.get_unique_id())
-	#print("player board owned by: %s | Am I authority? %s" % [get_multiplayer_authority(), is_multiplayer_authority()])
 	#board_state[Vector2i(5, 5)] = make_node_tile("C")
 	draw_visible_grid(Vector2i(0, 0), grid_size)
 	viewport.size = $SubViewportContainer.size
 
+	# p sure i don't need to check for authority here... oh wait yes i do
 	if multiplayer.is_server() and get_multiplayer_authority() == 1:
 		print("generating tile pool")
 		tile_pool = generate_tile_pool()
 		host_update_tile_count()
 	# THIS IS VERY TEMPORARY OKAY
 	#tile_rack.add_tile("A")
-	for i in range(7):
-		request_peel()
 
 	if get_multiplayer_authority() != multiplayer.get_unique_id():
 		visible = false
+	if not multiplayer.is_server():
+		$VBoxContainer/Start.visible = false
+		$VBoxContainer/Restart.visible = false
 	#peel_button.name = "Peel_%s" % get_multiplayer_authority()
 	peel_button.connect("pressed", _on_peel_pressed)
 	msgbox.visible = false
 	
-	var dict_filepath = "res://assets/dict.txt"
-	load_dictionary_from_file(dict_filepath)
+	if is_multiplayer_authority():
+		var dict_filepath = "res://assets/dict.txt"
+		load_dictionary_from_file(dict_filepath)
+		really_anyone_update_tile_count()
+	
+	
+	
+
 	
 
 
@@ -262,10 +269,11 @@ func host_request_peel():
 	for peer_id in multiplayer.get_peers():
 		if tile_pool.size() == 0:
 			print("bag empty!")
-			break
+			win_send_all(sender_id)
+			return
 		var tile = tile_pool.pop_back()
 		
-		# get teh board node for this peer and call rpc on it?
+		# get the board node for this peer and call rpc on it?
 		var board_node = get_node("/root/Main/%s/Board_%s" % [peer_id, peer_id])
 		board_node.rpc_id(peer_id, "give_tile", tile)
 	
@@ -273,9 +281,27 @@ func host_request_peel():
 	if (tile_pool.size() != 0):
 		var host_board = get_node("/root/Main/1/Board_1")
 		host_board.give_tile(tile_pool.pop_back())
+	else:
+		print("bag empty!")
+		win_send_all(sender_id)
 	
 	host_update_tile_count()
 
+func win_send_all(winner_id):
+	for peer_id in multiplayer.get_peers():
+		var board_node = get_node("/root/Main/%s/Board_%s" % [peer_id, peer_id])
+		board_node.rpc_id(peer_id, "win", winner_id)
+	# for the host
+	win(winner_id)
+
+@rpc("any_peer")
+func win(winner_id):
+	print("hello displaying message on %s screen" % multiplayer.get_unique_id())
+	var main = get_node("/root/Main")
+	var names = main.player_names
+	setMsgBox("%s has WON THE GAME!" % names.get(winner_id))
+		
+		
 
 func get_all_words() -> Array:
 	var words = []
@@ -368,14 +394,19 @@ func load_dictionary_from_file(filepath: String):
 		print("Dict loaded with %d words." % word_dict.size())
 	else:
 		printerr("err: could not open dict file at %s"  % filepath)
-	
 
+func really_anyone_update_tile_count():
+	anyone_update_tile_count.rpc_id(1)
+
+# really still have no idea how this works
+@rpc("any_peer", "call_local")
+func anyone_update_tile_count():
+	var board = get_node("/root/Main/1/Board_1")
+	board.host_update_tile_count()
 
 ## should only be called by authority = 1, is_server(). rpcs the tile count to everyone else to adjust.
 func host_update_tile_count():
-	print("hello this runs")
 	tilect = tile_pool.size()
-	print("tilect: ", tilect)
 	tile_count.text = "Tiles Left: %d" % tilect
 	for peer_id in multiplayer.get_peers():
 		rpc_id(peer_id, "update_tile_count", tilect)
@@ -406,7 +437,7 @@ func generate_tile_pool() -> Array:
 	# this is just testing lol
 	#for l in ["E", "D", "C", "B", "A"]:
 		#add_letter(pool, l, 1)
-#
+
 	pool = generate_array_default()
 
 	pool.shuffle()
@@ -437,3 +468,32 @@ func generate_array_default() -> Array:
 	add_letter(pool, "E", 18)
 
 	return pool
+
+
+func _on_start_pressed():
+	for i in range(7):
+		request_peel()
+
+func _on_restart_pressed():
+	# this is automatically true
+	# resetting tile_pool, board state, and tile rack.
+	if multiplayer.is_server() and get_multiplayer_authority() == 1:
+		print("generating tile pool")
+		tile_pool = generate_tile_pool()
+		host_update_tile_count()
+
+	
+	# Host pulls one tile for each player
+	for peer_id in multiplayer.get_peers():
+		var board_node = get_node("/root/Main/%s/Board_%s" % [peer_id, peer_id])
+		board_node.rpc_id(peer_id, "restart")
+	
+	restart()
+
+
+
+@rpc("any_peer")
+func restart():
+	board_state = {}
+	draw_visible_grid()
+	tile_rack.empty()

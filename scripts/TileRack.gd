@@ -24,6 +24,15 @@ func is_empty():
 			return false
 	return true
 
+func empty():
+	rack_queue.clear()
+	for child in tile_layer.get_children():
+		remove_tile(child)
+	rack.clear()
+	rack.resize(rack_limit)
+	update_queue_label()
+
+
 func _spawn_tile(letter: String):
 	var tile = preload("res://scenes/NodeTile.tscn").instantiate()
 	tile.letter = letter
@@ -47,7 +56,7 @@ func get_first_null(arr: Array) -> int:
 func remove_tile(tile: Node):
 	if tile.get_parent() == tile_layer:
 		var index = rack.find(tile)
-		print("index %d" % index)
+		#print("index %d" % index)
 		if index != -1:
 			rack[index] = null
 			tile_layer.remove_child(tile)
