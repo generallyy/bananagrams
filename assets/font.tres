@@ -1,0 +1,4 @@
+[gd_resource type="SystemFont" format=3 uid="uid://dp7o7ol4g8yfb"]
+
+[resource]
+font_names = PackedStringArray("Andale Mono")

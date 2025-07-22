@@ -1,29 +1,21 @@
-[gd_scene load_steps=11 format=3 uid="uid://erjjtd0lijub"]
+[gd_scene load_steps=9 format=3 uid="uid://erjjtd0lijub"]
 
 [ext_resource type="Script" path="res://scripts/PlayerBoard.gd" id="1_pjiff"]
 [ext_resource type="PackedScene" uid="uid://ctdxwxyed58yt" path="res://scenes/Cell.tscn" id="2_jjymn"]
 [ext_resource type="PackedScene" uid="uid://bav8flav72ovb" path="res://scenes/TileRack.tscn" id="3_5ua3k"]
 [ext_resource type="PackedScene" uid="uid://mt5xu4fsx1l2" path="res://scenes/DropLogic.tscn" id="3_fs1h7"]
-
-[sub_resource type="SystemFont" id="SystemFont_q3brd"]
-font_names = PackedStringArray("Andale Mono")
+[ext_resource type="SystemFont" uid="uid://dp7o7ol4g8yfb" path="res://assets/font.tres" id="5_kr8mg"]
 
 [sub_resource type="Theme" id="Theme_x22qi"]
-default_font = SubResource("SystemFont_q3brd")
+default_font = ExtResource("5_kr8mg")
 default_font_size = 30
-
-[sub_resource type="SystemFont" id="SystemFont_vvkwx"]
-font_names = PackedStringArray("Andale Mono")
 
 [sub_resource type="Theme" id="Theme_wikn8"]
-default_font = SubResource("SystemFont_vvkwx")
+default_font = ExtResource("5_kr8mg")
 default_font_size = 30
 
-[sub_resource type="SystemFont" id="SystemFont_4iscs"]
-font_names = PackedStringArray("Andale Mono")
-
 [sub_resource type="Theme" id="Theme_7v6c1"]
-default_font = SubResource("SystemFont_4iscs")
+default_font = ExtResource("5_kr8mg")
 default_font_size = 22
 
 [node name="PlayerBoard" type="Node2D"]

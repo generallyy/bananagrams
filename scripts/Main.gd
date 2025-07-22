@@ -14,14 +14,39 @@ var next_default_name = 1
 var connected_peer_ids = []
 var local_player_character
 
+const SERVER_PORT = 8080
+const SERVER_IP = "192.168.3.209"#"127.0.0.1"
+
 
 #func _ready():
 	#start_menu.visible = true
-
+#func _ready():
+	#var upnp = UPNP.new()
+	#var discover_result = upnp.discover()
+	#print("Discover Result: ", discover_result) # Add this
+#
+	#if discover_result == UPNP.UPNP_RESULT_SUCCESS:
+		#if upnp.get_gateway() and upnp.get_gateway().is_valid_gateway():
+			#var map_result_udp = upnp.add_port_mapping(9999,9999,"godot_udp", "UDP", 0)
+			#var map_result_tcp = upnp.add_port_mapping(9999,9999,"godot_tcp", "TCP", 0)
+			#print("UDP Map Result: ", map_result_udp) # Add this
+			#print("TCP Map Result: ", map_result_tcp) # Add this
+#
+			#if not map_result_udp == UPNP.UPNP_RESULT_SUCCESS:
+				## This fallback might not always help if the initial error is fundamental
+				##upnp.add_port_mapping(9999,9999,"","UDP")
+				#pass
+			#if not map_result_tcp == UPNP.UPNP_RESULT_SUCCESS:
+				## This fallback might not always help
+				#upnp.add_port_mapping(9999,9999,"","TCP")
+		#else:
+			#print("UPnP Gateway not found or invalid.") # Add this
+	#else:
+		#print("UPnP Discovery Failed.") # Add this
 
 func _on_host_pressed():
 	start_menu.visible = false
-	peer.create_server(135)
+	peer.create_server(SERVER_PORT)
 	multiplayer.multiplayer_peer = peer
 	
 	add_player_character()
@@ -36,7 +61,7 @@ func _on_host_pressed():
 
 func _on_join_pressed():
 	start_menu.visible = false
-	peer.create_client("localhost", 135)
+	peer.create_client(SERVER_IP, SERVER_PORT)
 	multiplayer.multiplayer_peer = peer
 
 

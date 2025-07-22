@@ -1,20 +1,14 @@
-[gd_scene load_steps=7 format=3 uid="uid://brvtubuhsvnjt"]
+[gd_scene load_steps=6 format=3 uid="uid://brvtubuhsvnjt"]
 
+[ext_resource type="SystemFont" uid="uid://dp7o7ol4g8yfb" path="res://assets/font.tres" id="1_bct5y"]
 [ext_resource type="Script" path="res://scripts/Main.gd" id="1_c455u"]
 
-[sub_resource type="SystemFont" id="SystemFont_m3p4o"]
-font_names = PackedStringArray("Andale Mono")
-subpixel_positioning = 0
-
 [sub_resource type="Theme" id="Theme_d8q4l"]
-default_font = SubResource("SystemFont_m3p4o")
+default_font = ExtResource("1_bct5y")
 default_font_size = 30
 
-[sub_resource type="SystemFont" id="SystemFont_q8yek"]
-font_names = PackedStringArray("Andale Mono")
-
 [sub_resource type="Theme" id="Theme_7l18r"]
-default_font = SubResource("SystemFont_q8yek")
+default_font = ExtResource("1_bct5y")
 default_font_size = 100
 
 [sub_resource type="Theme" id="Theme_ggpal"]
