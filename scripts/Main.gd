@@ -15,7 +15,7 @@ var connected_peer_ids = []
 var local_player_character
 
 const SERVER_PORT = 8080
-const SERVER_IP = "192.168.3.209"#"127.0.0.1"
+const SERVER_IP = "127.0.0.1"
 
 
 #func _ready():
@@ -54,6 +54,7 @@ func _on_host_pressed():
 	peer.peer_connected.connect(
 	func(new_peer_id):
 		#await get_tree().create_timer(1).timeout
+		print("CONNECTING PLAYER. . .")
 		rpc("add_newly_connected_player_character", new_peer_id)
 		rpc_id(new_peer_id, "add_previously_connected_player_characters", connected_peer_ids)
 		add_player_character(new_peer_id)
@@ -151,5 +152,3 @@ func broadcast_name_to_all(id: int, player_name: String):
 #func _on_player_disconnected(id):
 	#player_names.erase(id)
 	#update_player_ui()
-
-

@@ -4,6 +4,7 @@
 
 [sub_resource type="SystemFont" id="SystemFont_b6j20"]
 font_names = PackedStringArray("Andale Mono")
+subpixel_positioning = 0
 
 [sub_resource type="LabelSettings" id="LabelSettings_cu3t7"]
 font = SubResource("SystemFont_b6j20")

@@ -39,6 +39,3 @@ func create_board():
 
 func _enter_tree():
 	print(">> Player %s entering tree" % get_multiplayer_authority())
-
-
-

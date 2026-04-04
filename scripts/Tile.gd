@@ -73,4 +73,3 @@ func _notification(what):
 	if what == NOTIFICATION_DRAG_END:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		modulate = Color(1, 1, 1, 1)  # Restore original alpha
-
