@@ -54,7 +54,7 @@ max_length = 10
 
 [node name="AddressField" type="LineEdit" parent="Start Menu/VBoxContainer" unique_id=123456789]
 layout_mode = 2
-placeholder_text = "server address (e.g. abc.ply.gg:12345)"
+placeholder_text = "port#"
 alignment = 1
 
 [node name="PeersPanel" type="VBoxContainer" parent="." unique_id=2121147377]

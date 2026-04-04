@@ -41,7 +41,12 @@ func _snap_tile_to_board(tile: Area2D):
 	# if there's a tile beneath that tile
 	for other_tile in get_tree().get_nodes_in_group("draggable_tile"):
 		if other_tile.is_mouse_hovering() and not other_tile.dragging:
-			# other_tile will be on the board, and therefore have meta data.
+			# board tile dropped onto rack tile → move board tile to rack, no duplication
+			if tile.has_meta("origin_pos") and other_tile.get_parent() == board.tile_rack.tile_layer:
+				board.board_state.erase(tile.get_meta("origin_pos"))
+				board.tile_rack.add_tile(letter)
+				board.draw_visible_grid()
+				return
 			# case 1: tile is on board.
 			#			so, swap the positions on the board.
 			if tile.has_meta("origin_pos"):	# because only board tiles have meta data
@@ -59,12 +64,12 @@ func _snap_tile_to_board(tile: Area2D):
 				board.tile_rack.remove_tile(tile)
 				board.board_state.erase(other_tile.get_meta("origin_pos"))
 				board.tile_rack.add_tile(other_tile.letter)
-			
+
 			board.board_state[board_index] = board.make_node_tile(letter)
 			board.draw_visible_grid()
 			print("🟢 Two Tiles:    ", letter, " to ", board_index)
 			return  # should only be one
-	
+
 
 	# Remove old position from board_state
 	if tile.has_meta("origin_pos"):	# because only board tiles have meta data
@@ -74,10 +79,13 @@ func _snap_tile_to_board(tile: Area2D):
 	# Remove from tile rack if it's there
 	if tile.get_parent() == board.tile_rack.tile_layer:
 		board.tile_rack.remove_tile(tile)
-	## Snap and parent to board
-	#if tile.get_parent().get_parent() != grid_cells:
-		#grid_cells.add_child(tile)
-	#tile.position = snapped_pos
+
+	# If mouse is in the rack area, send tile to rack instead of placing on board
+	var vm = board.viewport.get_mouse_position()
+	if vm.y >= board.tile_rack.position.y - 32:
+		board.tile_rack.add_tile(letter)
+		board.draw_visible_grid()
+		return
 
 	board.board_state[board_index] = board.make_node_tile(letter)
 	board.draw_visible_grid()

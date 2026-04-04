@@ -1,6 +1,6 @@
-[gd_scene load_steps=9 format=3 uid="uid://erjjtd0lijub"]
+[gd_scene format=3 uid="uid://erjjtd0lijub"]
 
-[ext_resource type="Script" path="res://scripts/PlayerBoard.gd" id="1_pjiff"]
+[ext_resource type="Script" uid="uid://ch1gwk2ltb4kr" path="res://scripts/PlayerBoard.gd" id="1_pjiff"]
 [ext_resource type="PackedScene" uid="uid://ctdxwxyed58yt" path="res://scenes/Cell.tscn" id="2_jjymn"]
 [ext_resource type="PackedScene" uid="uid://bav8flav72ovb" path="res://scenes/TileRack.tscn" id="3_5ua3k"]
 [ext_resource type="PackedScene" uid="uid://mt5xu4fsx1l2" path="res://scenes/DropLogic.tscn" id="3_fs1h7"]
@@ -18,17 +18,17 @@ default_font_size = 30
 default_font = ExtResource("5_kr8mg")
 default_font_size = 22
 
-[node name="PlayerBoard" type="Node2D"]
+[node name="PlayerBoard" type="Node2D" unique_id=1142501920]
 z_index = -1
 script = ExtResource("1_pjiff")
 cell_scene = ExtResource("2_jjymn")
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+[node name="SubViewportContainer" type="SubViewportContainer" parent="." unique_id=231496916]
 offset_left = 162.0
 offset_right = 991.0
 offset_bottom = 648.0
 
-[node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer" unique_id=486347492]
 disable_3d = true
 handle_input_locally = false
 physics_object_picking = true
@@ -36,45 +36,46 @@ physics_object_picking_sort = true
 size = Vector2i(400, 400)
 render_target_update_mode = 4
 
-[node name="ZoomContainer" type="Node2D" parent="SubViewportContainer/SubViewport"]
+[node name="ZoomContainer" type="Node2D" parent="SubViewportContainer/SubViewport" unique_id=1983175191]
 
-[node name="GridCells" type="Node2D" parent="SubViewportContainer/SubViewport/ZoomContainer"]
+[node name="GridCells" type="Node2D" parent="SubViewportContainer/SubViewport/ZoomContainer" unique_id=228665279]
 
-[node name="sanity" type="Sprite2D" parent="SubViewportContainer/SubViewport/ZoomContainer"]
+[node name="sanity" type="Sprite2D" parent="SubViewportContainer/SubViewport/ZoomContainer" unique_id=2031721039]
+visible = false
 
-[node name="ColorRect" type="ColorRect" parent="SubViewportContainer/SubViewport/ZoomContainer/sanity"]
+[node name="ColorRect" type="ColorRect" parent="SubViewportContainer/SubViewport/ZoomContainer/sanity" unique_id=559014287]
 offset_right = 40.0
 offset_bottom = 40.0
 color = Color(0.854576, 0, 0.22683, 1)
 
-[node name="TileRack" parent="SubViewportContainer/SubViewport" instance=ExtResource("3_5ua3k")]
+[node name="TileRack" parent="SubViewportContainer/SubViewport" unique_id=1876750546 instance=ExtResource("3_5ua3k")]
 
-[node name="DropLogic" parent="." instance=ExtResource("3_fs1h7")]
+[node name="DropLogic" parent="." unique_id=1213094144 instance=ExtResource("3_fs1h7")]
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=351237004]
 offset_left = 987.0
 offset_top = 38.0
 offset_right = 1148.0
 offset_bottom = 144.0
 theme = SubResource("Theme_x22qi")
 
-[node name="Peel" type="Button" parent="VBoxContainer"]
+[node name="Peel" type="Button" parent="VBoxContainer" unique_id=127239376]
 layout_mode = 2
 text = "PEEL"
 
-[node name="Swap" type="Button" parent="VBoxContainer"]
+[node name="Swap" type="Button" parent="VBoxContainer" unique_id=856136857]
 layout_mode = 2
 text = "SWAP"
 
-[node name="Start" type="Button" parent="VBoxContainer"]
+[node name="Start" type="Button" parent="VBoxContainer" unique_id=118506462]
 layout_mode = 2
 text = "START"
 
-[node name="Restart" type="Button" parent="VBoxContainer"]
+[node name="Restart" type="Button" parent="VBoxContainer" unique_id=485636595]
 layout_mode = 2
 text = "RESTART"
 
-[node name="MsgBox" type="Label" parent="."]
+[node name="MsgBox" type="Label" parent="." unique_id=1250194475]
 offset_top = 137.0
 offset_right = 1152.0
 offset_bottom = 172.0
@@ -82,7 +83,7 @@ theme = SubResource("Theme_wikn8")
 text = "message box! not that you'll see this."
 horizontal_alignment = 1
 
-[node name="TileCount" type="Label" parent="."]
+[node name="TileCount" type="Label" parent="." unique_id=1790367729]
 offset_left = 782.0
 offset_top = 63.0
 offset_right = 925.0

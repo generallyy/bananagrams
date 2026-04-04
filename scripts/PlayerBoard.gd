@@ -23,14 +23,7 @@ var word_dict = {}
 @onready var swap_button = $VBoxContainer/Swap
 @onready var msgbox = $MsgBox
 @onready var tile_count = $TileCount
-@onready var sanity_dot = zoom_node.get_node("sanity")
 @onready var tile_rack = viewport.get_node("TileRack")
-
-
-func _process(_delta):
-	var mouse_pos = viewport.get_mouse_position()
-	var world_pos = zoom_node.get_global_transform().affine_inverse() * mouse_pos
-	sanity_dot.global_position = zoom_node.to_global(world_pos)
 
 func _ready():
 	#modulate.a = .5

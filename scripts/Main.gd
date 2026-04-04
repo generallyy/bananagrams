@@ -16,6 +16,7 @@ var connected_peer_ids = []
 var local_player_character
 
 const SERVER_PORT = 8080
+const SERVER_HOST = "womb-desk.gl.at.ply.gg"
 
 
 #func _ready():
@@ -66,22 +67,22 @@ func _on_join_pressed():
 		top_label.text = "Enter a server address to join."
 		return
 
-	var host: String
-	var port: int
-	if ":" in raw:
-		var parts = raw.split(":", false, 1)
-		host = parts[0]
-		port = parts[1].to_int()
-		if port <= 0 or port > 65535:
-			top_label.text = "Invalid port number."
-			return
-	else:
-		host = raw
-		port = SERVER_PORT
+	var host := SERVER_HOST
+	var port: int = raw.to_int()
+	if port <= 0 or port > 65535:
+		top_label.text = "Invalid port number."
+		return
 
 	start_menu.visible = false
+	multiplayer.connection_failed.connect(_on_connection_failed, CONNECT_ONE_SHOT)
 	peer.create_client(host, port)
 	multiplayer.multiplayer_peer = peer
+
+func _on_connection_failed():
+	peer = ENetMultiplayerPeer.new()
+	multiplayer.multiplayer_peer = null
+	start_menu.visible = true
+	top_label.text = "Connection failed. Check the address and try again."
 
 
 
