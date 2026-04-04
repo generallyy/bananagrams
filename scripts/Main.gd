@@ -7,6 +7,7 @@ var peer = ENetMultiplayerPeer.new()
 @onready var top_label = $Label
 @onready var right_panel = $PeersPanel/MarginContainer/PanelNames
 @onready var name_field = get_node("Start Menu/VBoxContainer/NameField")
+@onready var address_field = get_node("Start Menu/VBoxContainer/AddressField")
 
 var player_names = {} # dict of id : name
 var next_default_name = 1
@@ -15,7 +16,6 @@ var connected_peer_ids = []
 var local_player_character
 
 const SERVER_PORT = 8080
-const SERVER_IP = "127.0.0.1"
 
 
 #func _ready():
@@ -61,8 +61,26 @@ func _on_host_pressed():
 	)
 
 func _on_join_pressed():
+	var raw = address_field.text.strip_edges()
+	if raw.is_empty():
+		top_label.text = "Enter a server address to join."
+		return
+
+	var host: String
+	var port: int
+	if ":" in raw:
+		var parts = raw.split(":", false, 1)
+		host = parts[0]
+		port = parts[1].to_int()
+		if port <= 0 or port > 65535:
+			top_label.text = "Invalid port number."
+			return
+	else:
+		host = raw
+		port = SERVER_PORT
+
 	start_menu.visible = false
-	peer.create_client(SERVER_IP, SERVER_PORT)
+	peer.create_client(host, port)
 	multiplayer.multiplayer_peer = peer
 
 
