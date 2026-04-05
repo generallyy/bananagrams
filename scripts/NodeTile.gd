@@ -24,7 +24,6 @@ func _on_mouse_exited():
 func _input_event(_viewport, event, _shape_idx):
 	if event is InputEventMouseButton:
 		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-			print("hi this tile exists")
 			dragging = true
 			offset = get_global_mouse_position() - global_position
 		elif not event.pressed:

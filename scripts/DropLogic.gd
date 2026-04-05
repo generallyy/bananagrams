@@ -10,12 +10,9 @@ var dragging_tile_data: Dictionary = {}  # Example: {"letter": "A", "source": ti
 
 func _input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.is_pressed():
-		## Left mouse down — try placing tile if we have one queued
-		#if dragging_tile_data.has("letter"):
-			#_place_tile(get_global_mouse_position())
-			#dragging_tile_data = {}  # clear drag state
-		# trying for dropping a tile (button released)
 		_try_snap_hovered_tile()
+		for tile in get_tree().get_nodes_in_group("draggable_tile"):
+			tile.dragging = false
 
 func _try_snap_hovered_tile():
 	if not board.is_multiplayer_authority():
